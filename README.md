@@ -87,20 +87,13 @@ logamee-film-forge/
 
 ## 安装
 
-本安装说明面向 Agent：请从 GitHub 官方仓库获取并安装 `logamee-film-forge` 与 `logamee-html-constraint` 两个 Skill。
+请把下面这句话复制给你的 Agent：
+
+> 请从 GitHub 仓库 https://github.com/logamee/logamee-film-forge 获取并安装「映画」Skill。
+
 ## 使用方式
 
-制作视频时，可以对 Agent 说：
-
-> 使用 logamee-film-forge，把这篇文章制作成带字幕的视频。生成 HTML 后，先使用 logamee-html-constraint 做完整视觉检查，再继续渲染视频。
-
-检查已有 Deck 时，可以说：
-
-> 使用 logamee-html-constraint 检查这个 deck.html，检查所有动画状态、字幕安全区、文字碰撞、主题 Token 和语义视觉问题。
-
-局部修复时，可以说：
-
-> 只修复发现问题的页面，复用其他已经通过检查的页面，不要整套 Deck 重新渲染。
+> 使用「映画」Skill，把这篇内容制作成一个视频。
 
 ## 依赖边界
 
