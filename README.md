@@ -85,42 +85,9 @@ logamee-film-forge/
 
 如果只需要检查已有的 HTML PPT 或视频 Deck，可以单独使用 `logamee-html-constraint`，不需要加载完整的视频生产流程。
 
-## 安装方式
+## 安装
 
-本项目不要求 `npx`，不要求安装 CLI，也不要求运行安装脚本。
-
-最简单的安装方式是：
-
-1. 把这个仓库的根目录 `README.md` 交给你的 Agent。README 顶部已经写明官方仓库地址，Agent 应从该仓库读取两个平行目录的最新内容。
-2. 告诉 Agent：
-
-   > 请按照这个 README 安装 Logamee Film Forge 的两个 Skill，并让它们可以被当前 Agent 加载。
-
-3. Agent 应将两个平行目录分别复制到它自己的 Skill 目录：
-
-```text
-<agent-skills>/logamee-film-forge/
-<agent-skills>/logamee-html-constraint/
-```
-
-4. 两个目录中的 `SKILL.md` 是各自的入口文件。不要只复制根目录 README，也不要只复制主 Skill 而遗漏辅助约束 Skill。
-
-不同 Agent 的 Skill 目录位置可能不同。Agent 应使用自己的官方配置和 Skill 目录规则，不要把下面的示例路径当成固定路径：
-
-```text
-~/.hermes/skills/
-~/.codex/skills/
-```
-
-安装完成后，Agent 应验证：
-
-- `logamee-film-forge/SKILL.md` 存在
-- `logamee-html-constraint/SKILL.md` 存在
-- 两个 Skill 的 references 文件完整
-- frontmatter 中的 `name` 正确
-- 主 Skill 能被加载
-- 辅助约束 Skill 能被加载
-
+本安装说明面向 Agent：请从 GitHub 官方仓库获取并安装 `logamee-film-forge` 与 `logamee-html-constraint` 两个 Skill。
 ## 使用方式
 
 制作视频时，可以对 Agent 说：
