@@ -1,4 +1,4 @@
-# Logamee Film Forge
+# 映画（Logamee Film Forge）
 
 官方仓库：<https://github.com/logamee/logamee-film-forge>
 
