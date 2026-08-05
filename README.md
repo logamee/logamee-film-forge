@@ -1,30 +1,165 @@
-# logamee-film-forge
+# Logamee Film Forge
 
-逻辑帧团队开源的内容驱动视频制作 Skill。
+官方仓库：<https://github.com/logamee/logamee-film-forge>
 
-它把文章、脚本或口播材料，组织成可验证的 HTML 演示文稿和旁白视频生产流程，覆盖：
+逻辑帧团队开源的内容驱动视频制作 Skill 组合。
 
-- 内容理解与主题提炼
-- Storyboard 与逐页规格
-- 内容驱动的画面逻辑与动画
-- HTML Deck 构建与视觉检查
-- TTS 音频、字幕时间轴与口播同步
-- 浏览器逐帧录制、音视频合成与最终验收
+它把“把文章做成视频”和“检查视频画面是否合格”拆成两个平行 Skill：一个负责生产，一个负责约束。两个 Skill 放在同一个仓库中，但可以分别安装、分别加载、分别使用。
 
-## 文件结构
+## 两个 Skill
 
-- `SKILL.md`：完整工作流与验收规则
-- `references/FORM-MAP.md`：内容关系到视觉形式的映射规则
-- `references/TOOLKIT.md`：HTML、动画和浏览器录制的工程约束
-- `references/cloned-voice-video-production.md`：克隆音色、降噪、字幕和录制流程
-- `references/tts-source-selection.md`：TTS 来源选择、探测和元数据记录
+```text
+logamee-film-forge/
+├── README.md
+├── LICENSE
+├── logamee-film-forge/
+│   ├── SKILL.md
+│   └── references/
+└── logamee-html-constraint/
+    ├── SKILL.md
+    └── references/
+```
 
-## 使用
+### logamee-film-forge
 
-将本仓库作为 Skill 目录加载到兼容的 Agent 工具中，目录名保持为 `logamee-film-forge`。运行时依赖由使用者按工作流需要提供，例如浏览器自动化工具、ffmpeg、TTS 服务和本地动画库。
+主流程 Skill，负责把文章、脚本或口播材料制作成带字幕的 HTML 视频和 MP4：
 
-本 Skill 不捆绑模型权重、声音、浏览器、JavaScript 库或凭据。
+```text
+文章或脚本
+  → 内容理解
+  → 主题提取
+  → Storyboard
+  → Slide Specs
+  → Visual Logic
+  → HTML Deck
+  → TTS 音频
+  → 字幕与音频对齐
+  → 浏览器渲染
+  → MP4 合成
+```
 
-## 许可证
+它负责内容、叙事、页面结构、动画、音频、字幕、浏览器录制和最终视频组装。
 
-MIT License。版权归属：逻辑帧。
+### logamee-html-constraint
+
+辅助约束 Skill，负责检查 HTML 页面和视频 Deck 是否达到最低质量标准。它不负责生成内容，也不负责替换主题设计。
+
+它检查：
+
+- 字体、字号、行高和 `clamp()` 响应式尺寸
+- 间距、舞台尺寸和 16:9 录制安全区
+- 文本、字幕、页码、品牌标识之间的碰撞
+- 颜色对比度和主题 Token 使用
+- GSAP 动画的 0%、25%、50%、75%、100% 状态
+- 父容器内部越界和视觉边界穿透
+- 字幕是否压缩或遮挡页面内容
+- 屏幕文字是否重复字幕
+- 二维码、截图、传播图旁是否出现多余解释文字
+- 页面是否只是没有语义的“卡片加标题”
+- 页面是否有清晰的视觉关系、动作和最终状态
+- 一个页面发现的问题是否触发整套 Deck 的同类问题扫描
+
+## 两者如何配合
+
+推荐流程：
+
+```text
+加载 logamee-film-forge
+  ↓
+完成内容理解、Storyboard、Slide Specs、Visual Logic
+  ↓
+生成 deck.html
+  ↓
+加载 logamee-html-constraint
+  ↓
+执行视觉约束和动画状态检查
+  ↓
+根据检查结果修正 deck.html
+  ↓
+用户确认视觉版本
+  ↓
+生成 TTS、字幕和最终 MP4
+```
+
+`logamee-film-forge` 是生产流程，`logamee-html-constraint` 是质量门。辅助 Skill 不应该被复制进主 Skill，也不应该被当成主题模板使用。
+
+如果只需要检查已有的 HTML PPT 或视频 Deck，可以单独使用 `logamee-html-constraint`，不需要加载完整的视频生产流程。
+
+## 安装方式
+
+本项目不要求 `npx`，不要求安装 CLI，也不要求运行安装脚本。
+
+最简单的安装方式是：
+
+1. 把这个仓库的根目录 `README.md` 交给你的 Agent。README 顶部已经写明官方仓库地址，Agent 应从该仓库读取两个平行目录的最新内容。
+2. 告诉 Agent：
+
+   > 请按照这个 README 安装 Logamee Film Forge 的两个 Skill，并让它们可以被当前 Agent 加载。
+
+3. Agent 应将两个平行目录分别复制到它自己的 Skill 目录：
+
+```text
+<agent-skills>/logamee-film-forge/
+<agent-skills>/logamee-html-constraint/
+```
+
+4. 两个目录中的 `SKILL.md` 是各自的入口文件。不要只复制根目录 README，也不要只复制主 Skill 而遗漏辅助约束 Skill。
+
+不同 Agent 的 Skill 目录位置可能不同。Agent 应使用自己的官方配置和 Skill 目录规则，不要把下面的示例路径当成固定路径：
+
+```text
+~/.hermes/skills/
+~/.codex/skills/
+```
+
+安装完成后，Agent 应验证：
+
+- `logamee-film-forge/SKILL.md` 存在
+- `logamee-html-constraint/SKILL.md` 存在
+- 两个 Skill 的 references 文件完整
+- frontmatter 中的 `name` 正确
+- 主 Skill 能被加载
+- 辅助约束 Skill 能被加载
+
+## 使用方式
+
+制作视频时，可以对 Agent 说：
+
+> 使用 logamee-film-forge，把这篇文章制作成带字幕的视频。生成 HTML 后，先使用 logamee-html-constraint 做完整视觉检查，再继续渲染视频。
+
+检查已有 Deck 时，可以说：
+
+> 使用 logamee-html-constraint 检查这个 deck.html，检查所有动画状态、字幕安全区、文字碰撞、主题 Token 和语义视觉问题。
+
+局部修复时，可以说：
+
+> 只修复发现问题的页面，复用其他已经通过检查的页面，不要整套 Deck 重新渲染。
+
+## 依赖边界
+
+仓库只提供 Skill 文档、检查规则和参考材料，不捆绑运行时依赖、浏览器、TTS 引擎、ffmpeg、GSAP 文件、模型权重或声音资产。
+
+具体项目需要哪些工具，由 Agent 根据当前环境检查并向用户报告。没有经过用户确认，不应静默安装大型模型、下载浏览器或切换 TTS 服务。
+
+## 开源协议
+
+MIT License。详见 [LICENSE](LICENSE)。
+
+## 仓库结构
+
+```text
+logamee-film-forge/
+├── README.md
+├── LICENSE
+├── logamee-film-forge/
+│   ├── SKILL.md
+│   └── references/
+│       ├── FORM-MAP.md
+│       ├── TOOLKIT.md
+│       ├── cloned-voice-video-production.md
+│       └── tts-source-selection.md
+└── logamee-html-constraint/
+    ├── SKILL.md
+    └── references/
+        └── demo.html
+```

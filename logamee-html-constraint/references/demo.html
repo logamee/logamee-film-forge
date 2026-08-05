@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harness Engineering</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=IBM+Plex+Sans:wght@400;500&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; }
+
+  :root {
+    --surface: #f1f3f5;
+    --text: #0a1f3d;
+    --text-mute: #4a5a78;
+    --accent: #1e3a8a;
+    --rule: #c6cdd6;
+    --pad: clamp(24px, 4vw, 80px);
+  }
+
+  body {
+    background: var(--surface);
+    font-family: 'Noto Serif SC', serif;
+    color: var(--text);
+  }
+
+  .step { display:none; }
+  .step.on { display:flex; justify-content:center; align-items:center; min-height:100vh; }
+
+  /* ─── Step 0: Cover ─── */
+  .cover { flex-direction:column; text-align:center; padding:var(--pad); }
+  .kicker { font-family:'IBM Plex Sans',sans-serif; font-size:clamp(14px,1.2vw,24px); letter-spacing:4px; color:var(--text-mute); margin-bottom:clamp(12px,1.2vw,24px); }
+  h1 { font-size:clamp(40px,6vw,96px); font-weight:700; line-height:1.08; margin-bottom:clamp(12px,1.5vw,28px); }
+  h1 em { color:var(--accent); font-style:italic; }
+  .rule { width:clamp(60px,6vw,100px); height:3px; background:var(--accent); border:0; margin:0 auto clamp(12px,1.5vw,28px); }
+  .desc { font-family:'IBM Plex Sans',sans-serif; font-size:clamp(16px,1.5vw,28px); color:var(--text-mute); line-height:1.6; max-width:50ch; }
+
+  /* ─── Step 1: Formula ─── */
+  .formula { flex-direction:column; text-align:center; padding:var(--pad); }
+  .f-main { font-size:clamp(36px,5vw,80px); font-style:italic; color:var(--accent); font-weight:500; }
+  .f-rule { width:clamp(80px,7vw,120px); height:1px; background:var(--rule); border:0; margin:clamp(14px,1.5vw,28px) auto; }
+  .f-sub { font-size:clamp(28px,3.5vw,56px); font-weight:700; line-height:1.3; }
+  .f-note { font-family:'IBM Plex Sans',sans-serif; font-size:clamp(14px,1.3vw,24px); color:var(--text-mute); margin-top:clamp(14px,1.5vw,28px); }
+
+  /* ─── Step 2: Cards ─── */
+  .cards { flex-direction:column; padding:var(--pad); }
+  .cards h2 { font-size:clamp(30px,4vw,64px); font-weight:700; }
+  .cards .sub { font-family:'IBM Plex Sans',sans-serif; font-size:clamp(14px,1.4vw,24px); color:var(--text-mute); margin:8px 0 clamp(16px,2vw,36px); }
+  .card-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:clamp(12px,1.5vw,24px); max-width:min(1100px, 90%); margin:0 auto; }
+  .card { background:#fff; border-radius:12px; padding:clamp(16px,2vw,32px) clamp(12px,1.5vw,24px); text-align:center; border:1px solid var(--rule); }
+  .card .num { font-size:clamp(28px,3vw,42px); font-style:italic; color:var(--accent); font-weight:500; }
+  .card .label { font-size:clamp(16px,1.4vw,22px); font-weight:600; margin:8px 0 4px; }
+  .card .desc { font-family:'IBM Plex Sans',sans-serif; font-size:clamp(12px,1.1vw,18px); color:var(--text-mute); }
+
+  @keyframes rise { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .a0 { animation:rise 0.5s ease-out both; }
+  .a1 { animation-delay:0.15s; } .a2 { animation-delay:0.3s; }
+  .a3 { animation-delay:0.45s; } .a4 { animation-delay:0.6s; }
+  .a5 { animation-delay:0.75s; } .a6 { animation-delay:0.9s; }
+  .a7 { animation-delay:1.05s; } .a8 { animation-delay:1.2s; }
+</style>
+</head>
+<body onclick="next()">
+
+  <div class="step cover on" id="p0">
+    <div class="kicker a0">CHAPTER 01</div>
+    <h1 class="a0 a1">Harness <em>Engineering</em></h1>
+    <hr class="rule a0 a2">
+    <p class="desc a0 a3">Agent 能做成什么事，不只看它用了多大的模型，<br>更要看它被放在什么样的环境里。</p>
+  </div>
+
+  <div class="step formula" id="p1">
+    <div class="f-main a0">Agent = Model + Harness</div>
+    <hr class="f-rule a0 a1">
+    <div class="f-sub a0 a2">模型决定能力上限<br>环境决定交付下限</div>
+    <div class="f-note a0 a3">用流程、检查点和自检机制来驾驭 AI 的能力</div>
+  </div>
+
+  <div class="step cards" id="p2">
+    <div class="kicker a0">CHAPTER 01 · 底层原理</div>
+    <h2 class="a0 a1">翻来覆去就这六条</h2>
+    <div class="sub a0 a2">所有上层技术都建立在这六个核心概念之上</div>
+    <div class="card-grid">
+      <div class="card a0 a3"><div class="num">01</div><div class="label">无记忆</div><div class="desc">每次推理独立</div></div>
+      <div class="card a0 a4"><div class="num">02</div><div class="label">概率性</div><div class="desc">输出非确定</div></div>
+      <div class="card a0 a5"><div class="num">03</div><div class="label">涌现</div><div class="desc">量变到质变</div></div>
+      <div class="card a0 a6"><div class="num">04</div><div class="label">幻觉</div><div class="desc">模型会编造</div></div>
+      <div class="card a0 a7"><div class="num">05</div><div class="label">推理</div><div class="desc">链式思考</div></div>
+      <div class="card a0 a8"><div class="num">06</div><div class="label">上下文</div><div class="desc">窗口即视野</div></div>
+    </div>
+  </div>
+
+<script>
+let c=0;
+function next(){document.getElementById('p'+c).classList.remove('on');c=(c+1)%3;document.getElementById('p'+c).classList.add('on');}
+</script>
+</body>
+</html>
