@@ -18,7 +18,15 @@
 [![Stars](https://img.shields.io/github/stars/logamee/logamee-film-forge?style=flat&logo=github&logoColor=white&color=FFB74D)](https://github.com/logamee/logamee-film-forge)
 [![Version](https://img.shields.io/badge/version-1.0.0-607D8B?style=flat&logo=git&logoColor=white)](https://github.com/logamee/logamee-film-forge)
 [![Platform](https://img.shields.io/badge/macOS%20%7C%20Linux%20%7C%20Windows-9C27B0?style=flat&logo=apple&logoColor=white)](SKILL.md)
-[![Compatible](https://img.shields.io/badge/Claude%20%7C%20Hermes%20%7C%20Codex-1565C0?style=flat&logo=openai&logoColor=white)](SKILL.md)
+[![Claude](https://img.shields.io/badge/Claude-000000?style=flat&logo=anthropic&logoColor=white)](SKILL.md)
+[![Hermes](https://img.shields.io/badge/Hermes-1565C0?style=flat)](SKILL.md)
+[![Codex](https://img.shields.io/badge/Codex-10A37F?style=flat)](SKILL.md)
+[![Cursor](https://img.shields.io/badge/Cursor-6B21A8?style=flat&logo=cursor&logoColor=white)](SKILL.md)
+[![GitHub Copilot](https://img.shields.io/badge/GitHub%20Copilot-24292F?style=flat&logo=github&logoColor=white)](SKILL.md)
+[![QoderWork](https://img.shields.io/badge/QoderWork-8B5CF6?style=flat)](SKILL.md)
+[![WorkBuddy](https://img.shields.io/badge/WorkBuddy-EF4444?style=flat)](SKILL.md)
+[![Coze](https://img.shields.io/badge/Coze-7C3AED?style=flat&logo=coze&logoColor=white)](SKILL.md)
+[![TRAE](https://img.shields.io/badge/TRAE-0D9488?style=flat)](SKILL.md)
 
 ---
 
