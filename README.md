@@ -1,10 +1,47 @@
-# 映画（Logamee Film Forge）
+<div align="center">
 
-官方仓库：<https://github.com/logamee/logamee-film-forge>
+<img src="assets/logo.svg" width="320" alt="映画 Logamee Film Forge logo" />
+
+# 映画 · Logamee Film Forge
+
+**把文章变成有口播、有字幕、能录制的演示视频。**
 
 逻辑帧团队开源的内容驱动视频制作 Skill 组合。
 
-它把“把文章做成视频”和“检查视频画面是否合格”拆成两个平行 Skill：一个负责生产，一个负责约束。两个 Skill 放在同一个仓库中，但可以分别安装、分别加载、分别使用。
+一个负责生产，一个负责约束。两个 Skill 放在同一个仓库里，可以分别安装、分别加载、分别使用。
+
+</div>
+
+---
+
+[![License](https://img.shields.io/github/license/logamee/logamee-film-forge?style=flat&logo=opensourceinitiative&logoColor=white&color=4CAF50)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/logamee/logamee-film-forge?style=flat&logo=github&logoColor=white&color=FFB74D)](https://github.com/logamee/logamee-film-forge)
+[![Version](https://img.shields.io/badge/version-1.0.0-607D8B?style=flat&logo=git&logoColor=white)](https://github.com/logamee/logamee-film-forge)
+[![Platform](https://img.shields.io/badge/macOS%20%7C%20Linux%20%7C%20Windows-9C27B0?style=flat&logo=apple&logoColor=white)](SKILL.md)
+[![Compatible](https://img.shields.io/badge/Claude%20%7C%20Hermes%20%7C%20Codex-1565C0?style=flat&logo=openai&logoColor=white)](SKILL.md)
+
+---
+
+## 目录
+
+- [这是什么](#这是什么)
+- [两个 Skill](#两个-skill)
+- [两者如何配合](#两者如何配合)
+- [快速开始](#快速开始)
+- [使用方式](#使用方式)
+- [依赖边界](#依赖边界)
+- [仓库结构](#仓库结构)
+- [贡献](#贡献)
+- [开源协议](#开源协议)
+
+## 这是什么
+
+它把「把文章做成视频」和「检查视频画面是否合格」拆成两个平行 Skill：
+
+- **logamee-film-forge** — 生产流程：文章 → Storyboard → HTML Deck → TTS → 字幕 → MP4
+- **logamee-html-constraint** — 质量门：检查字体、间距、动画、字幕、越界等最低质量标准
+
+仓库只提供 Skill 文档、检查规则和参考材料，不捆绑运行时依赖。
 
 ## 两个 Skill
 
@@ -12,12 +49,19 @@
 logamee-film-forge/
 ├── README.md
 ├── LICENSE
+├── assets/
+│   └── logo.svg
 ├── logamee-film-forge/
 │   ├── SKILL.md
 │   └── references/
+│       ├── FORM-MAP.md
+│       ├── TOOLKIT.md
+│       ├── cloned-voice-video-production.md
+│       └── tts-source-selection.md
 └── logamee-html-constraint/
     ├── SKILL.md
     └── references/
+        └── demo.html
 ```
 
 ### logamee-film-forge
@@ -55,7 +99,7 @@ logamee-film-forge/
 - 字幕是否压缩或遮挡页面内容
 - 屏幕文字是否重复字幕
 - 二维码、截图、传播图旁是否出现多余解释文字
-- 页面是否只是没有语义的“卡片加标题”
+- 页面是否只是没有语义的「卡片加标题」
 - 页面是否有清晰的视觉关系、动作和最终状态
 - 一个页面发现的问题是否触发整套 Deck 的同类问题扫描
 
@@ -85,11 +129,21 @@ logamee-film-forge/
 
 如果只需要检查已有的 HTML PPT 或视频 Deck，可以单独使用 `logamee-html-constraint`，不需要加载完整的视频生产流程。
 
-## 安装
+## 快速开始
 
 请把下面这句话复制给你的 Agent：
 
 > 请从 GitHub 仓库 https://github.com/logamee/logamee-film-forge 获取并安装「映画」Skill。
+
+手动安装（可选）：
+
+```bash
+# 把两个 Skill 复制到你的 Agent 技能目录
+cp -R logamee-film-forge ~/.hermes/skills/   # Hermes
+cp -R logamee-film-forge ~/.claude/skills/   # Claude Code
+cp -R logamee-html-constraint ~/.hermes/skills/
+cp -R logamee-html-constraint ~/.claude/skills/
+```
 
 ## 使用方式
 
@@ -101,25 +155,15 @@ logamee-film-forge/
 
 具体项目需要哪些工具，由 Agent 根据当前环境检查并向用户报告。没有经过用户确认，不应静默安装大型模型、下载浏览器或切换 TTS 服务。
 
+## 贡献
+
+欢迎提交 Issue 和 Pull Request。改进建议请说明动机和效果，不要只改措辞。
+
+- 报告问题：[GitHub Issues](https://github.com/logamee/logamee-film-forge/issues)
+- 提交代码：[Pull Requests](https://github.com/logamee/logamee-film-forge/pulls)
+
 ## 开源协议
 
-MIT License。详见 [LICENSE](LICENSE)。
+[MIT License](LICENSE)
 
-## 仓库结构
-
-```text
-logamee-film-forge/
-├── README.md
-├── LICENSE
-├── logamee-film-forge/
-│   ├── SKILL.md
-│   └── references/
-│       ├── FORM-MAP.md
-│       ├── TOOLKIT.md
-│       ├── cloned-voice-video-production.md
-│       └── tts-source-selection.md
-└── logamee-html-constraint/
-    ├── SKILL.md
-    └── references/
-        └── demo.html
-```
+Copyright (c) 2026 Logamee contributors

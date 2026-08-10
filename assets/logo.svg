@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200" role="img" aria-label="映画 Logamee Film Forge logo">
+  <!-- 背景 -->
+  <rect width="320" height="200" rx="24" fill="#171512"/>
+  <!-- 胶片孔 -->
+  <g fill="#f7f4ec" opacity="0.9">
+    <rect x="28" y="40" width="14" height="10" rx="2"/>
+    <rect x="28" y="70" width="14" height="10" rx="2"/>
+    <rect x="28" y="100" width="14" height="10" rx="2"/>
+    <rect x="28" y="130" width="14" height="10" rx="2"/>
+    <rect x="278" y="40" width="14" height="10" rx="2"/>
+    <rect x="278" y="70" width="14" height="10" rx="2"/>
+    <rect x="278" y="100" width="14" height="10" rx="2"/>
+    <rect x="278" y="130" width="14" height="10" rx="2"/>
+  </g>
+  <!-- 胶片带 -->
+  <rect x="52" y="36" width="216" height="128" rx="8" fill="none" stroke="#f7f4ec" stroke-width="3"/>
+  <!-- 中央画面：山与太阳 -->
+  <circle cx="160" cy="78" r="20" fill="#e8a33d"/>
+  <path d="M82 148 L132 88 L166 132 L186 108 L238 148 Z" fill="#c8503a"/>
+  <path d="M132 88 L122 100 L132 98 L142 100 Z" fill="#f7f4ec" opacity="0.8"/>
+  <!-- 播放三角 -->
+  <polygon points="196,66 232,88 196,110" fill="#f7f4ec"/>
+  <!-- 底部文字 -->
+  <text x="160" y="178" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, sans-serif" font-size="26" font-weight="700" fill="#f7f4ec">映画</text>
+  <text x="160" y="196" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" letter-spacing="3" fill="#f7f4ec" opacity="0.65">LO GAMEE · FILM FORGE</text>
+</svg>
