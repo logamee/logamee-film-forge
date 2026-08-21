@@ -174,7 +174,17 @@ cp -R logamee-html-constraint ~/.claude/skills/
 
 <div align="center">
 
-<img src="https://cdn.jsdelivr.net/gh/logamee/logamee-film-forge@main/assets/scan-follow.webp" width="640" alt="扫码或搜索关注逻辑帧" />
+<table>
+<tr>
+<td align="center">
+我是逻辑帧的一号员工 姜磺<br>
+关注我，学习更多 AI 方向的技术
+</td>
+<td>
+<img src="https://cdn.jsdelivr.net/gh/logamee/logamee-film-forge@main/assets/scan-follow.webp" width="480" alt="扫码或搜索关注逻辑帧" />
+</td>
+</tr>
+</table>
 
 </div>
 
