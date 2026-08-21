@@ -170,6 +170,14 @@ cp -R logamee-html-constraint ~/.claude/skills/
 - 报告问题：[GitHub Issues](https://github.com/logamee/logamee-film-forge/issues)
 - 提交代码：[Pull Requests](https://github.com/logamee/logamee-film-forge/pulls)
 
+## 关注逻辑帧
+
+<div align="center">
+
+<img src="assets/scan-follow.webp" width="640" alt="扫码或搜索关注逻辑帧" />
+
+</div>
+
 ## 开源协议
 
 [MIT License](LICENSE)
