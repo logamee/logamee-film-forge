@@ -174,7 +174,7 @@ cp -R logamee-html-constraint ~/.claude/skills/
 
 <div align="center">
 
-<img src="assets/scan-follow.webp" width="640" alt="扫码或搜索关注逻辑帧" />
+<img src="https://cdn.jsdelivr.net/gh/logamee/logamee-film-forge@main/assets/scan-follow.webp" width="640" alt="扫码或搜索关注逻辑帧" />
 
 </div>
 
