@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/logo.svg" width="320" alt="映画 Logamee Film Forge logo" />
+<img src="https://cdn.jsdelivr.net/gh/logamee/logamee-film-forge@main/assets/logo.svg" width="320" alt="映画 Logamee Film Forge logo" />
 
 # 映画 · Logamee Film Forge
 
