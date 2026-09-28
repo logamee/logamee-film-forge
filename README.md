@@ -1,19 +1,5 @@
 <div align="center">
 
-## 演示视频
-
-<a href="assets/logamee-film-forge-demo.mp4">
-  <img src="assets/demo-poster.jpg" width="960" alt="点击播放 Logamee Film Forge 完整演示视频" />
-</a>
-
-点击封面播放完整演示 · 约 12 分 9 秒 · 1080p
-
-</div>
-
----
-
-<div align="center">
-
 <img src="https://cdn.jsdelivr.net/gh/logamee/logamee-film-forge@main/assets/logo.svg" width="320" alt="映画 Logamee Film Forge logo" />
 
 # 映画 · Logamee Film Forge
@@ -46,7 +32,6 @@
 
 ## 目录
 
-- [演示视频](#演示视频)
 - [这是什么](#这是什么)
 - [两个 Skill](#两个-skill)
 - [两者如何配合](#两者如何配合)
@@ -64,7 +49,9 @@
 - **logamee-film-forge** — 生产流程：文章 → Storyboard → HTML Deck → TTS → 字幕 → MP4
 - **logamee-html-constraint** — 质量门：检查字体、间距、动画、字幕、越界等最低质量标准
 
-仓库提供 Skill 文档、检查规则、参考材料和完整演示视频，不捆绑运行时依赖。
+演示效果见：[微信公众号文章](https://mp.weixin.qq.com/s/scYzvNoLG4q6dhvFX2yFsw)。
+
+仓库只提供 Skill 文档、检查规则和参考材料，不捆绑运行时依赖。
 
 ## 两个 Skill
 
@@ -73,8 +60,6 @@ logamee-film-forge/
 ├── README.md
 ├── LICENSE
 ├── assets/
-│   ├── demo-poster.jpg
-│   ├── logamee-film-forge-demo.mp4
 │   ├── logo.svg
 │   └── scan-follow.webp
 ├── logamee-film-forge/
@@ -177,7 +162,7 @@ cp -R logamee-html-constraint ~/.claude/skills/
 
 ## 依赖边界
 
-仓库提供 Skill 文档、检查规则、参考材料和完整演示视频；不捆绑运行时依赖、浏览器、TTS 引擎、ffmpeg、GSAP 文件、模型权重或声音资产。
+仓库只提供 Skill 文档、检查规则和参考材料，不捆绑运行时依赖、浏览器、TTS 引擎、ffmpeg、GSAP 文件、模型权重或声音资产。
 
 具体项目需要哪些工具，由 Agent 根据当前环境检查并向用户报告。没有经过用户确认，不应静默安装大型模型、下载浏览器或切换 TTS 服务。
 
