@@ -20,6 +20,10 @@ No CDN dependencies. If a local dependency is missing, do not download it withou
 
 ## GSAP
 
+Choose timeline architecture by production format.
+
+### Deck Mode
+
 GSAP is the timeline director. Every slide should own one timeline.
 
 ```js
@@ -38,6 +42,33 @@ Rules:
 - Use GSAP `x`/`y` for movement instead of overwriting layout transforms.
 - Animate to express the storyboard `Animation` intent, not to decorate elements.
 - Do not use CSS keyframes or nested `setTimeout` as the main animation sequencer.
+
+### Film Mode
+
+Film mode uses one deterministic global master timeline.
+
+```js
+const master = gsap.timeline({ paused: true });
+
+master.add(sceneOne(), 0)
+  .add(sceneTwo(), 4.2)
+  .add(sceneThree(), 8.1);
+
+window.seekFilm = (seconds) => {
+  master.time(Math.max(0, Math.min(seconds, master.duration())), false);
+};
+```
+
+Rules:
+
+- Place every Scene and Shot at an explicit global timeline position.
+- Nested scene timelines may organize code, but they remain children of the master timeline.
+- Preserve objects across scene boundaries when the meaning continues.
+- Allow intentional overlap between outgoing and incoming scenes.
+- Derive visible state from absolute timeline time so repeated seeking is deterministic.
+- Use the same timeline implementation for manual preview, audio-driven preview, timestamp screenshots, and final render.
+- Do not use page-local reset logic, CSS keyframes, `setTimeout`, or uncontrolled randomness as timeline authority.
+- Expose a deterministic seek API and a ready signal before automated capture.
 
 ## HTML/CSS/SVG Patterns
 
