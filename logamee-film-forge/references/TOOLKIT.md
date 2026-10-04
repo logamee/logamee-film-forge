@@ -66,7 +66,7 @@ Rules:
 - Preserve objects across scene boundaries when the meaning continues.
 - Allow intentional overlap between outgoing and incoming scenes.
 - Derive visible state from absolute timeline time so repeated seeking is deterministic.
-- Use the same timeline implementation for manual preview, audio-driven preview, timestamp screenshots, and final render.
+- Use the same composition and state resolver for manual preview, audio-driven preview, timestamp screenshots, and final render. Select the mode-appropriate clock: independent deterministic timing for the no-audio demonstration, and audio-bound cue timing for synchronized preview and final render.
 - Do not use page-local reset logic, CSS keyframes, `setTimeout`, or uncontrolled randomness as timeline authority.
 - Expose a deterministic seek API and a ready signal before automated capture.
 

@@ -155,7 +155,7 @@ Output `film.html`.
 - Use GSAP `set` calls to establish the full initial state before the first rendered frame.
 - Load fonts and visual assets before declaring the film ready for capture.
 - Expose a readiness signal such as `window.filmReady === true`.
-- Audio is the final clock. Before TTS, use narration-derived provisional scene ranges; after TTS, replace them with measured audio timing.
+- The no-audio animation demonstration uses an independent deterministic timeline. Local-audio review follows the provisional audio clock; after formal TTS, rebuild scene, cue, and subtitle timing from measured formal audio.
 - Final preview should drive the master timeline from audio current time. Rendering without audio should seek the same timeline by absolute time or frame.
 
 ## Continuity Techniques
@@ -182,7 +182,7 @@ Avoid:
 
 ## Local Preview and TTS
 
-- Local subtitle preview uses the same global timeline and estimated narration timing.
+- Keep the review modes distinct: static review shows subtitle text without animation; the no-audio demonstration uses its own global timeline while subtitles remain independent; local-audio review maps the provisional audio clock to the global timeline and subtitles; formal review and export use measured formal-audio timing.
 - TTS may be generated per narrated Scene so failures and revisions remain isolated.
 - Do not add silence at every scene boundary. Add pauses only where the spoken delivery or edit requires one.
 - Concatenate scene audio in narration order and record measured Scene durations.

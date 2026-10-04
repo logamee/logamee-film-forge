@@ -112,7 +112,7 @@ Minimum fields:
 
 ## Preview and Render Parity
 
-Use the same implementation for:
+Use one composition and state resolver for:
 
 1. no-audio motion preview;
 2. fast local audio preview;
@@ -120,12 +120,22 @@ Use the same implementation for:
 4. timestamp inspection;
 5. headless recording or frame-driven export.
 
-Only the clock source changes:
+The review mode determines how timeline time is produced:
 
-- no-audio preview uses provisional narration time;
-- audio preview uses `audio.currentTime`;
-- timestamp inspection uses an explicit `seek` call;
-- export uses `frame / fps` or an equivalent absolute-time seek.
+- static layout review resolves the still state and does not advance animation;
+- no-audio motion preview advances a deterministic demonstration timeline.
+  Subtitles may remain still or advance independently, and never trigger or
+  delay animation cues;
+- local-audio and formal-audio previews use the audio-bound cue timeline, with
+  `audio.currentTime` as the playback clock;
+- timestamp inspection seeks the requested absolute time through the same
+  state resolver;
+- export uses `frame / fps` or an equivalent absolute-time seek against the
+  approved audio-bound timeline.
+
+The no-audio demonstration may use different event timing from synchronized
+playback, but it must preserve the planned semantic states and their order.
+Do not build a separate visual implementation for demonstration or recording.
 
 Never create a second "recording animation" that approximates the review
 animation. That is how cues disappear, paths jump, and the recorded video
@@ -198,7 +208,10 @@ repeated seeks to representative timestamps.
 
 Determinism does not make weak motion acceptable. The following still apply:
 
-- every semantic change has a narration or subtitle owner;
+- every semantic change has a narration or subtitle owner in the approved
+  storyboard or cue map;
+- the no-audio demonstration may time those states independently, while
+  audio-synchronized preview and export must honor the corresponding cue times;
 - a meaningful path is drawn, a signal travels, a structure assembles, or a
   state transforms; generic fade-in is not a substitute;
 - context remains present and readable;
@@ -218,7 +231,10 @@ Before approving a timeline-driven change, answer:
 - Can the exact state at any timestamp be reproduced without playing from zero?
 - Does the same HTML drive both review and export?
 - Does a regenerated audio unit invalidate and rebuild all downstream timing?
-- Does every meaningful visual change wait for its spoken cue?
+- Does the no-audio demonstration preserve the planned semantic order without
+  claiming synchronization?
+- In audio-bound review and export, does each meaningful visual change follow
+  its spoken cue?
 - Can a diagnostic report identify the failing slide, timestamp, or cue?
 - Does the final frame remain readable after temporary focus or transition
   treatment is removed?

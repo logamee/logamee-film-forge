@@ -1,15 +1,15 @@
 # Deck Design and HTML
 
-Read this reference for deck visual planning, semantic animation, HTML implementation, and self-checks. Film projects use [film-mode.md](film-mode.md).
+Read this reference for deck visual planning, semantic animation, HTML implementation, and self-checks. Apply the independent [Deck Art Direction](deck-art-direction.md) and [Deck Visual Design Standard](deck-visual-design-standard.md) to every deck page. Film projects use [film-mode.md](film-mode.md) and must not inherit page-specific composition rules.
 
 ## Contents
 
-- [Step 7: Visual or Motion Logic](#step-7-visual-or-motion-logic)
+- [Internal: Visual or Motion Logic](#internal-visual-or-motion-logic)
 - [Cover - Title](#cover---title)
 - [Slide 01 - Title](#slide-01---title)
-- [Step 8: Build and Self-Check HTML](#step-8-build-and-self-check-html)
+- [Internal: Build and Self-Check HTML](#internal-build-and-self-check-html)
 
-## Step 7: Visual or Motion Logic
+## Internal: Visual or Motion Logic
 
 Inputs: active frozen specs, `theme-extraction.md`, [FORM-MAP.md](FORM-MAP.md), [TOOLKIT.md](TOOLKIT.md), visual constraint checking, and frontend-quality review.
 
@@ -21,6 +21,7 @@ Output:
 For `film`, read and follow [film-mode.md](film-mode.md). Plan persistent objects, Shots, camera/view behavior, continuity contracts, readable states, and provisional global timeline ranges. Do not build `film.html` until `motion-logic.md` exists.
 
 For `deck`, use the visual-logic schema and rules below. Do not build `deck.html` until `visual-logic.md` exists.
+Apply [deck-art-direction.md](deck-art-direction.md) and [deck-visual-design-standard.md](deck-visual-design-standard.md) while planning each page. Art direction defines the page's point of view, restraint, signature gesture, and visual voice. The visual standard defines hierarchy, typography, composition, imagery, and deck-level consistency. This file continues to define semantic form, cue-driven animation, HTML behavior, and validation.
 
 ### Deck Visual Logic
 
@@ -28,6 +29,21 @@ For the cover, write only the static visual logic. The cover is not animated:
 
 ```md
 ## Cover - Title
+
+### Design Contract
+- Viewer Takeaway:
+- Visual Claim:
+- Design Point of View:
+- Signature Move:
+- Deliberate Omission:
+- Primary Focal Anchor:
+- Secondary Evidence / Support:
+- Viewer Action (if any):
+- Reading Order:
+- Screen-Text Budget:
+- Image Treatment:
+- Asset Scale and Placement Rationale:
+- Composition / Space Intent:
 
 ### Content Relation
 The opening identity and topic signal.
@@ -46,6 +62,21 @@ For every content slide, write:
 
 ```md
 ## Slide 01 - Title
+
+### Design Contract
+- Viewer Takeaway:
+- Visual Claim:
+- Design Point of View:
+- Signature Move:
+- Deliberate Omission:
+- Primary Focal Anchor:
+- Secondary Evidence / Support:
+- Viewer Action (if any):
+- Reading Order:
+- Screen-Text Budget:
+- Image Treatment:
+- Asset Scale and Placement Rationale:
+- Composition / Space Intent:
 
 ### Content Relation
 The real relationship being explained: chaos-to-order, progression, hierarchy, contrast, cause/effect, misconception correction, system, conflict, conclusion, etc.
@@ -70,7 +101,7 @@ If the form uses connected nodes, plan the connection as visible segments betwee
 What must stay on screen, and what should be left to narration/subtitles. The screen must be understandable on its own at the main-idea level, but it should not carry every detail when narration already carries those details.
 
 ### Animation Logic
-How motion changes understanding. It must say what appears first, what changes, what resolves, and where the final focus lands. Every explanatory change must have a corresponding spoken cue; do not design a self-running sequence that ignores the narration.
+How motion changes understanding. It must say what appears first, what changes, what resolves, and where the final focus lands. Map explanatory changes to exact narration anchors in the `Cue Map`. The no-audio demonstration may play those planned states on its own timeline; only audio-synchronized modes must wait for the corresponding spoken cue.
 
 ### Cue Map
 The semantic anchors that drive the visual timeline.
@@ -111,6 +142,10 @@ Rules:
 
 - `visual-logic.md` must use `FORM-MAP.md` deliberately, but not mechanically.
 - Start from the slide's `Goal`, `Narration`, and `Animation`, not from the amount of text.
+- Every page's `Design Contract` must distinguish its takeaway and first-look focal anchor from supporting evidence and any viewer action. Record why each image or screenshot has its chosen scale and placement; do not leave hierarchy implicit as "balanced."
+- Treat a URL or access instruction as essential action text, not a footnote. Keep it in the same semantic composition as its related image or claim, and size it to the essential-text floor in `deck-visual-design-standard.md`.
+- When a screenshot is supporting evidence beside a separate claim or action, follow the default rendered-width ceiling and documented exception rule in `deck-visual-design-standard.md`. Do not enlarge it simply to fill the available canvas.
+- Before approving a changed page, render the active HTML and compare it at the target output size with the immediately previous and next pages. Source inspection, stale screenshots, or clean automated diagnostics alone are not evidence that the visual hierarchy passes.
 - Write `Semantic Noun` and `Semantic Verb` before `Visual Form`. If either field is vague, the slide is not ready for layout.
 - Write `Cue Map` and choose a `Focus Mode` before HTML generation. If a visual event has no spoken anchor, it must be justified as a neutral setup, transition, or final settling action rather than running independently.
 - Calibrate the visual system on representative pages before applying it broadly.
@@ -132,23 +167,29 @@ Rules:
 - For every text-bearing visual, check the final rendered size at the intended output
   resolution. Labels that are technically present but require zooming to read fail
   the composition review.
-- Treat `0%` as a real designed frame, not merely an implementation starting value. It should normally contain a quiet, readable scaffold rather than an empty stage: stable labels, final positions, and broad structure may already exist at low contrast, while semantic paths and explanatory changes wait for their cues. Text-bearing elements must be either fully readable or fully hidden at the initial state. Never scale a text container to a small nonzero height/width that exposes compressed boxes, clipped glyphs, or half-readable labels.
+- Treat `0%` as a real designed frame, not merely an implementation starting value. It should normally contain a quiet, readable scaffold rather than an empty stage: stable labels, final positions, and broad structure may already exist at low contrast. In audio-synchronized modes, semantic paths and explanatory changes wait for their cues; the no-audio demonstration may advance those same states independently. Text-bearing elements must be either fully readable or fully hidden at the initial state. Never scale a text container to a small nonzero height/width that exposes compressed boxes, clipped glyphs, or half-readable labels.
 - For node-link visuals, every relationship line must be readable as a connector in the final still frame. Lines should occupy gaps between nodes, not sit underneath nodes as partially hidden background strokes.
 - Neutral gray lines are reserved for genuine guides, inactive history, document internals, or secondary traces. A line that carries the main argument must use the slide's semantic accent and animate according to its meaning.
 - Plan screen text as a two-layer reading system: screen text carries the visual skeleton; narration/subtitles carry detail, examples, and nuance.
 - If a slide feels crowded, remove secondary screen text before shrinking fonts or squeezing layout. The viewer should still understand the visual claim without hearing every detail.
-- Treat estimated narration duration as a temporary clock only before audio exists. Use it to preview cue order and approximate pacing, then replace it with fast-preview or formal audio timing.
-- The default deck animation must not complete all explanatory events before the narration reaches them. A slide may establish a minimal visual scaffold early, but its meaningful changes remain attached to spoken cues.
-- Semantic synchronization is a hard requirement whenever motion explains, highlights, compares, introduces, or resolves content. The timeline follows narration/subtitle cues rather than playing independently.
-- Do not stretch motion merely to fill a long narration. Hold a meaningful state when the narration explains it, and reserve changes for new spoken ideas.
+- Use estimated narration duration only when a pre-audio review needs an approximate reading schedule. The no-audio animation demonstration has its own deterministic timeline; replace estimated timing with measured local-audio and then formal-audio timing for synchronized review and export.
+- In audio-synchronized modes, the deck animation must not complete explanatory events before the narration reaches them. A slide may establish a minimal visual scaffold early, but meaningful changes follow spoken cues. The no-audio demonstration may advance the same planned states independently.
+- Semantic synchronization is a hard requirement in local-audio review, formal-audio review, and final export whenever motion explains, highlights, compares, introduces, or resolves content. The no-audio demonstration preserves semantic order and state design, but does not claim cue timing.
+- Do not stretch motion merely to fill a long narration. In audio-synchronized modes, hold a meaningful state while the narration explains it and reserve changes for new spoken ideas; in the no-audio demonstration, use deliberate readable holds on its independent timeline.
 - Use spotlight/focus when a slide explains multiple items in sequence. The spotlight may be a colored field, contrast shift, moving ring, focus line, scale change, or another restrained visual device, but it must preserve enough context to show the relationship among items.
-- Apply Spotlight 2.0 to all sequential focus compositions: persistent occupancy, cue-bound handoffs, and a visible semantic relation. Reject implementations that only set inactive items to gray and active items to full opacity, or that reveal each item with an unrelated pop.
+- Apply Spotlight 2.0 to all sequential focus compositions: persistent occupancy, cue-mapped handoffs, and a visible semantic relation. Audio-synchronized modes time handoffs to cues; the no-audio demonstration stages the same states independently. Reject implementations that only set inactive items to gray and active items to full opacity, or that reveal each item with an unrelated pop.
 - Choose the final state before implementation. Use `peer` for the common case of equivalent items; reserve `result` for a genuine conclusion. Never infer `result` solely from the fact that the last item was narrated last.
 - Prefer soft color transfer, edge accents, moving focus fields, relationship-line activation, or restrained scale changes over abrupt visibility changes. Keep the focus treatment subordinate to the content and consistent with the slide's visual language.
 - Avoid forcing several independently explained features into one crowded slide. If each feature needs its own visual relation or more than one spoken paragraph, split the content into consecutive slides and preserve narration continuity between them.
-- Human checkpoint recommended before rebuilding `deck.html`, especially for first versions.
+- For a new deck, calibrate the visual system on representative pages before
+  expanding to the full deck; report that calibration in User Step 8 instead of
+  creating another approval stage.
 
-## Step 8: Build and Self-Check HTML
+## Internal: Build and Self-Check HTML
+
+HTML implementation happens after User Step 7 and before User Step 8. It is
+internal production work, not an additional user approval stage. User Step 8
+reviews the rendered static result through `?review=1`.
 
 Inputs: active frozen specs, active logic file, `theme-extraction.md`, [TOOLKIT.md](TOOLKIT.md), visual constraint checking, and frontend-quality review.
 
@@ -193,33 +234,39 @@ Do not apply the deck interaction and slide-local timeline rules below to film m
 
 ### Deck HTML
 
-Use estimated slide timing only for the first visual version, before either fast preview audio or formal TTS exists:
+Use estimated timing only for review modes that do not yet have audio:
 
 - Chinese narration preview: normally 4.5-5.5 visible characters/second for a clear teaching voice. Use 5 characters/second as the default unless the project records a different speaking style.
 - English: about 2.5 words/second
 - give every slide a small pause before advancing
-- establish a minimal readable scaffold early, but keep explanatory events attached to narration/subtitle cues
-- keep each cue state readable while its corresponding passage is spoken
-- use the slide's `Narration` and `Cue Map` as the visual timing contract; do not let a slide's explanatory animation autoplay independently
+- establish a minimal readable scaffold early
+- keep the no-audio animation demonstration on its own deterministic timeline; it may show subtitles, but subtitle boundaries do not trigger or delay animation
+- use the slide's `Narration` and `Cue Map` to define the semantic relationship between speech and visual events; timing is bound to spoken cues only in audio-synchronized modes
 
-Subtitle and cue preview timing:
+Subtitle and animation timing by review mode:
 
 - split Chinese subtitles by natural punctuation such as `。`, `；`, `：`, and only then by length if one line becomes too long
 - do not give every subtitle segment the same duration
 - estimate each segment from its own visible character count, using the project speaking-rate constant
 - add a small punctuation pause after sentence-like segments
 - clamp each segment so very short fragments do not flash and very long fragments do not block the next beat
-- derive cue boundaries from the same segments used for subtitle preview
-- use this only before audio exists; after fast preview audio, replace estimates with measured preview timing, and after formal TTS replace them again with precise final timestamps
+- in static layout review, show the relevant subtitle/narration text without advancing it or animating the page
+- in the no-audio animation demonstration, run animation by its demonstration timeline; subtitle text may remain visible or advance independently, but never acts as its clock
+- for local-audio sync, align subtitle and semantic cue boundaries against that exact local audio and let its playback time drive both
+- for formal sync, regenerate subtitle and cue timestamps from the exact formal audio
 
 Interaction rules:
 
-- manual mode: Space advances, Backspace goes back
-- ArrowRight advances and ArrowLeft goes back as keyboard alternatives.
+- `Space` or `P` pauses/resumes the active review clock.
+- `ArrowRight` or `ArrowDown` advances to the next page.
+- `ArrowLeft` or `ArrowUp` returns to the previous page.
+- `S` shows or hides the current page's complete narration/subtitle note.
 - Do not render visible previous/next arrow controls in presentation or video decks unless the user explicitly asks for clickable navigation. These controls compete with the composition and are normally absent from the final recording.
-- no click-to-advance
+- Do not use click-to-advance as the primary navigation model.
 - each slide owns one GSAP Timeline
-- page timelines may initialize on slide entry, but semantic events advance only from cue-driven time or an explicitly selected manual cue control
+- in static layout review, do not animate
+- in the no-audio demonstration, advance semantic events from its independent deterministic demonstration time
+- in local-audio and formal-audio synchronized modes, advance semantic events from the audio-bound cue timeline
 - avoid nested `setTimeout` as animation sequencing
 - `open deck.html` should work for non-audio review; audio preview may require a local HTTP server
 
@@ -281,7 +328,11 @@ Run two semantic-expression checks on every settled slide:
 
 - **Text-removal check:** temporarily hide labels and inspect the remaining geometry. It should still communicate the major action or relation. Exact terminology may disappear; semantic structure must not.
 - **First-viewer paraphrase check:** show the settled frame without explanation and ask what it expresses. Passing means the viewer can restate the transformation, system, hierarchy, contrast, or state. If the response only repeats labels, the slide is still a styled transcript.
-- **Cue-follow check:** play the slide with provisional or real subtitles and verify that each meaningful visual change occurs when its spoken anchor is active. A slide fails when the focus moves before the phrase, after the phrase has ended, or independently of the narration.
+- **Cue-follow check:** in local-audio and formal-audio synchronized review,
+  verify that each meaningful visual change occurs when its spoken anchor is
+  active. A slide fails when the focus moves before the phrase or after it has
+  ended. The no-audio animation demonstration uses an independent clock and
+  does not pass or fail this synchronization check.
 - **Spotlight check:** when a spotlight is used, verify that the active item is unmistakable, inactive context remains legible, and the focus treatment expresses the relationship instead of merely decorating the page.
 - **Spotlight state check:** inspect `base`, every cue handoff, and `settled`. Confirm that required items occupy stable positions, the previous focus releases as the next focus arrives, connectors or semantic SVG details participate when relevant, and no state depends on a sudden hidden-to-visible pop without a documented reason.
 

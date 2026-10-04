@@ -4,68 +4,84 @@ Read this reference for provisional preview, voice selection, audio generation, 
 
 ## Contents
 
-- [Step 9: Local Motion-and-Subtitle Preview](#step-9-local-motion-and-subtitle-preview)
-- [Step 10: TTS](#step-10-tts)
-- [Step 11: Timing and Subtitle Sync](#step-11-timing-and-subtitle-sync)
-- [Step 12: Browser Preview](#step-12-browser-preview)
+- [User Steps 8-10: Three Distinct Review Modes](#user-steps-8-10-three-distinct-review-modes)
+- [User Step 11: Formal TTS](#user-step-11-formal-tts)
+- [User Step 12: Timing and Subtitle Sync](#user-step-12-timing-and-subtitle-sync)
+- [User Step 13: Formal Browser Preview](#user-step-13-formal-browser-preview)
 
-## Step 9: Local Motion-and-Subtitle Preview
+## User Steps 8-10: Three Distinct Review Modes
 
-Inputs: approved active HTML and active frozen-spec `Narration` fields.
+These modes must remain separate. All three show the subtitle/narration text,
+but only the local-audio and formal-audio modes bind animation to spoken cues.
 
-Outputs:
+### User Step 8: Static Layout
 
-- an approved no-audio motion/subtitle preview, normally through `?motionPreview=1` or an equivalent mode
-- optionally, isolated fast-preview audio under `audio-preview/`
-- provisional durations, subtitle segments, and cue timing that are explicitly marked non-final
+Use `?review=1` or an equivalent static mode.
 
-This step is mandatory before any remote, cloned, paid, or token-heavy TTS call. It must not depend on formal TTS.
+- Show the slide's relevant narration as visible subtitle text in its normal
+  subtitle-safe region.
+- Do not play audio or animate the composition.
+- Page navigation may be used to inspect each static layout.
+- Review typography, hierarchy, composition, spacing, text/shape/path
+  collisions, viewport containment, and subtitle-safe areas.
+- This mode approves layout only; it does not approve animation or timing.
 
-### No-Audio Motion Preview
+### User Step 9: No-Audio Animation Demonstration
 
-- Generate subtitle text from each slide's or scene's frozen `Narration`.
-- Split by natural punctuation first; split overly long Chinese segments again by comma, enumeration punctuation, or dash.
-- Estimate timing from visible character count and the project speaking-rate constant.
-- Derive semantic cue ranges from the same subtitle segments, plus explicit `Cue Map` anchors.
-- Drive the active visual timeline from those provisional cue ranges. Do not run a complete explanatory animation independently of the narration estimate.
-- In `deck`, add a short pause between slides, normally about 0.35-0.6 seconds.
-- In `film`, do not add silence at every Scene boundary. Preserve continuous time and use only pauses justified by narration or edit rhythm.
-- Keep `?review=1` as a static page/narration inspection mode. Do not use it as the animation preview.
-- Provide a separate `?motionPreview=1` mode that shows the animated page, provisional subtitles, current cue, and pause/replay controls without requiring audio.
-- Ask the user to approve wording, segmentation, cue order, rough rhythm, visual progression, spotlight behavior, and whether the image matches the spoken passage.
+Use `?motionPreview=1` or an equivalent no-audio demonstration mode.
 
-### Fast Local Audio Preview
+- Keep the narration subtitle text visible. It may be shown as the complete
+  page passage or advanced on its own provisional reading schedule.
+- Run the animation on its own deterministic demonstration timeline. It must
+  not wait for subtitle boundaries, and subtitle changes must not trigger
+  animation cues in this mode.
+- Allow replay, pause, and deterministic seeking of the demonstration.
+- Review the motion itself: order, legibility, continuity, focus, smoothness,
+  collision during movement, and settled states.
+- This mode demonstrates animation quality only. Never describe it as proof
+  that animation follows narration.
 
-Use this optional layer when the no-audio preview is structurally approved but real speaking pace still needs checking.
+### User Step 10: Local-Audio Synchronized Animation
 
-- Prefer an already-installed local voice command, such as macOS `say`, or another explicitly configured low-cost local preview channel.
-- Generate one provisional audio file per narrated slide or Scene under `audio-preview/`, never under formal `audio/`.
-- Generate `audio-preview/durations.json` and, when needed, `audio-preview/subtitles.json`.
-- Use the same browser timeline, subtitle renderer, cue map, and spotlight implementation as formal preview. Only the clock and voice source differ.
-- Label the preview voice and all generated timing as provisional. Do not use fast-preview audio as the formal narration or final mix.
-- If the local preview command is unavailable, continue with `motionPreview` rather than silently installing or selecting a formal TTS provider.
+Use `?audioPreview=1` or an equivalent mode with a real local audio file.
 
-### Revision Rule
+- Use an available local voice or an existing provisional audio file. Do not
+  silently select or install a formal TTS provider for this preview.
+- Keep the audio provisional and store generated files under `audio-preview/`,
+  never under formal `audio/`.
+- Store its measured durations and audio-aligned subtitle/cue timestamps under
+  `audio-preview/durations.json` and `audio-preview/subtitles.json`.
+- Drive audio playback, subtitle display, semantic animation cues, and unit
+  completion from the same audio clock. Do not use estimated character timing
+  once this audio exists.
+- Review real speaking pace, pauses, subtitle readability, cue handoffs,
+  animation timing, and page/scene transitions.
+- This is the first mode that approves narration-to-animation synchronization.
+- If no usable local audio source exists, report the blocker and ask whether
+  the user wants to configure one or explicitly skip this gate. Do not
+  misrepresent the no-audio demonstration as a substitute.
 
-If the user edits narration after either preview:
+If the user edits narration after any of these reviews:
 
 1. return to `narration-script.md` and reapprove the spoken master;
 2. update `storyboard.md` and re-freeze affected specs;
 3. rebuild the active HTML and cue maps;
-4. mark affected `audio-preview/` timing stale and regenerate `motionPreview`;
-5. only then call formal TTS.
+4. mark affected provisional subtitles, cues, and `audio-preview/` timing
+   stale, then repeat the affected review modes in order;
+5. only then proceed to formal TTS.
 
-Do not call remote TTS, cloned TTS, or token-heavy TTS while narration, subtitle segmentation, cue order, or visual mapping is still under review.
+Do not call remote, cloned, paid, or token-heavy TTS while the static layout,
+animation demonstration, or local-audio synchronization is still under review.
 
 Human checkpoint required.
 
-## Step 10: TTS
+## User Step 11: Formal TTS
 
 Inputs: approved active HTML, approved motion/subtitle preview, optional approved fast audio preview, and active frozen-spec `Narration` fields.
 
 Output: one audio file per narrated slide or Scene, duration record, `audio/all.wav` or `audio/all.mp3`, and `audio/tts-metadata.md`.
 
-Start formal Step 10 with a mandatory voice-source gate. The fast local preview voice is not a formal voice selection and must not silently become the final voice. If the runtime provides an interactive choice tool, use it; otherwise present the same four choices as a plain selection list. Do not begin formal synthesis, install a TTS package, or silently choose a provider until the user selects one:
+Start User Step 11 with a mandatory voice-source gate. The local preview voice is not a formal voice selection and must not silently become the final voice. If the runtime provides an interactive choice tool, use it; otherwise present the same four choices as a plain selection list. Do not begin formal synthesis, install a TTS package, or silently choose a provider until the user selects one:
 
 1. **Use my own voice-cloning API** — the user owns or controls a cloning service.
 2. **Use a cloned voice already configured in this environment** — discover and list only providers/presets that can be probed successfully.
@@ -143,15 +159,23 @@ After audio is generated, do not stop at a file list. Update the timing records 
 - in `deck`, keep the cover duration in the deck timeline, normally about 3 seconds
 - in `film`, use the opening Shot's approved duration; do not insert automatic cover silence
 - make sure the active HTML references the actual per-unit audio files
-- do not ask the user to approve `?preview=1` yet; exact subtitle sync has not been generated
+- do not ask the user to approve `?preview=1` yet; exact timing for the
+  formal audio has not been generated
 
-The user checkpoint at this step is voice quality, not full video approval. If needed, give the user a short audio sample or a partial audio preview. Full video preview happens after Step 11 creates precise subtitle timing.
+The user checkpoint at this step is formal voice quality, not full video
+approval. Full formal preview happens after User Step 12 creates precise
+subtitle timing.
 
 In `deck`, the cover frame has no narration by default. Do not generate TTS for `cover.md` unless the user explicitly adds cover narration. Its default 3-second duration is handled in the deck timeline. Film mode has no mandatory cover artifact.
 
-If narration changes after this step, return to Step 3, revise and reapprove `narration-script.md`, update the storyboard mapping, re-freeze, rerun Step 9 motion and subtitle review, mark affected fast-preview timing stale, regenerate affected formal audio, rebuild `audio/all.*`, rebuild timestamps, update preview, and recheck sync. Preserve stale files unless the user approves deleting their exact paths.
+If narration changes after this step, return to User Step 5, revise and
+reapprove `narration-script.md`, update the storyboard mapping, re-freeze,
+rebuild the HTML, repeat User Steps 8-10 for affected units, regenerate
+affected formal audio, rebuild `audio/all.*`, rebuild timestamps, update the
+formal preview, and recheck sync. Preserve stale files unless the user
+approves deleting their exact paths.
 
-## Step 11: Timing and Subtitle Sync
+## User Step 12: Timing and Subtitle Sync
 
 Inputs: `audio/`, active frozen specs, and active HTML.
 
@@ -178,7 +202,10 @@ Use audio as the clock:
 - create `subtitles.json` with per-unit relative timestamps and global offsets so browser preview can sync audio and visuals
 - create `subtitles.srt` for final video or subtitle burning
 - the active HTML `?preview=1` must read `subtitles.json` when it exists; only pre-TTS subtitle preview may use estimated duration splitting
-- `?preview=1` must use the same cue-driven timeline implementation as `?motionPreview=1`; only the clock changes from estimated/preview time to formal audio time
+- `?preview=1` must use the same audio-bound cue timeline implementation as
+  `?audioPreview=1`; only the audio asset and its exact timing data change.
+  It must not inherit the independent demonstration clock from
+  `?motionPreview=1`.
 - in `deck`, preserve a short inter-slide pause unless the user explicitly asks for hard cuts
 - In `deck`, make the inter-slide pause visibly and audibly longer than an ordinary sentence pause, while keeping it short enough that the deck does not feel stalled. The default target is 0.6-1.0 seconds.
 - in `film`, preserve the approved continuous global timeline and only add intentional pauses
@@ -202,7 +229,7 @@ Machine checks:
 - the timeline manifest's unit boundaries, cue starts, subtitle intervals, audio
   revisions, and total duration agree with the active HTML and processed audio
 
-## Step 12: Browser Preview
+## User Step 13: Formal Browser Preview
 
 Inputs: active HTML, formal `audio/NN.*`, `audio/durations.json`, `subtitles.json`, `subtitles.srt`.
 
@@ -225,11 +252,13 @@ Keyboard playback is required in deck preview:
 
 - `Space` or `P`: pause/resume the complete playback state. Pausing must freeze audio, subtitle progression, inter-slide timers, and cue-driven animation at the same position.
 - `ArrowDown` or `ArrowRight`: move to the next slide.
-- `ArrowUp` or `ArrowLeft`: move to the previous slide. `Backspace` may be an additional previous-slide shortcut.
+- `ArrowUp` or `ArrowLeft`: move to the previous slide.
 - Keep the persistent upper-right control rail available on every page, including current-page replay and full-deck replay. Do not add a second page-level play button.
 - When navigation occurs during audio preview, stop the old page audio and pending inter-slide timer, load the target page's audio, reset its subtitle/cue state, and begin from that page's start.
 - Never let audio from the previous page continue under the newly displayed page.
-- Keep the same controls available in fast local preview and formal `?preview=1`; only the audio/timestamp source changes.
+- Keep the same synchronized controls available in `?audioPreview=1` and
+  formal `?preview=1`; only the audio/timestamp source changes. The no-audio
+  `?motionPreview=1` uses its own demonstration controls and clock.
 - When a user jumps or a test harness seeks, resolve the target state directly
   from the absolute timeline. Do not simulate a jump by replaying every
   preceding animation callback.

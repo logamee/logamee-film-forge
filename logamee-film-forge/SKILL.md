@@ -9,7 +9,7 @@ description: |
   traceable stages.
 license: MIT
 metadata:
-  version: "1.12.0"
+  version: "1.20.0"
   author: Logamee
 ---
 
@@ -26,11 +26,27 @@ It does not create a video from chat memory. It creates a chain of files, and ev
 
 HyperFrames-inspired ideas are used as production contracts, not as a runtime
 dependency. Read [references/hyperframes-adaptation.md](references/hyperframes-adaptation.md)
-when implementing or reviewing timeline-driven motion.
+only when implementing or reviewing deterministic timeline behavior.
+
+The numbered list in [User-Facing Workflow](#user-facing-workflow) is the only
+user-facing production workflow. The internal pipeline, artifact contract, and
+references explain how to execute those steps; they do not create extra
+approval stages. Archiving is an optional post-delivery lifecycle state, not an
+additional production approval step.
+Steps 8-10 and 13 are visual/audio approval gates. Step 11 is a voice-quality
+gate. Steps 12 and 14 normally produce machine reports rather than requiring a
+new design decision. Use [references/index.md](references/index.md) to load
+only the reference needed for the current phase.
 
 ## Compatibility
 
-Companion capabilities are visual-constraint checking and frontend-quality review. System tools vary by selected workflow and commonly include ffmpeg, a Chromium-family browser with Playwright or equivalent automation, Node.js/npm, a local GSAP bundle, a user-selected TTS channel, and an optional timestamp/alignment tool.
+Quality capabilities include visual-constraint checking and frontend-quality
+review. They may come from the companion skill, an equivalent local tool, or a
+documented manual review; these capability names are not mandatory dependency
+names. System tools vary by selected workflow and commonly include ffmpeg, a
+Chromium-family browser with Playwright or equivalent automation, Node.js/npm, a
+local GSAP bundle, a user-selected TTS channel, and an optional
+timestamp/alignment tool.
 
 The workflow supports macOS, Linux, and Windows when equivalent tools are available. Probe executable paths and capabilities instead of assuming one operating system.
 
@@ -57,7 +73,9 @@ When `Production Format: film`, read and follow [references/film-mode.md](refere
 - At the end of every numbered step, update `project-config.md` with `Current Step`, `Last Completed Step`, and any blocker or pending user decision.
 - In `semi-auto` mode, do not start the next numbered step until the user gives feedback after the current step. A generated file is not permission to continue.
 - If a required input file is missing or stale, stop and regenerate it. Do not guess.
-- `article.md` is the original source and is never edited.
+- The confirmed source is preserved verbatim. `article.md` is the default
+  normalized source snapshot, not a requirement that the original input be an
+  article; scripts, source directories, and asset packages are also valid.
 - `content-understanding.md` proves that the source was understood before any visual planning begins.
 - `narration-script.md` is the independently reviewed spoken master. Approve it before theme extraction or storyboard planning.
 - `theme-extraction.md` is the only theme input used by HTML generation. Never copy layout, components, typography systems, or animations from the source theme skill.
@@ -65,21 +83,43 @@ When `Production Format: film`, read and follow [references/film-mode.md](refere
 - In `deck`, a complete static cover frame is required by default. In `film`, the opening identity is a designed shot; it may move, but the first encoded frame must still be intentional, complete, and clean.
 - Frozen specs are generated mechanically from `storyboard.md`: `slide-specs/` for `deck`, `scene-specs/` for `film`. Do not hand-edit frozen specs.
 - A visual implementation plan is required before HTML generation: `visual-logic.md` for `deck`, `motion-logic.md` for `film`.
+- For every `deck` page, `visual-logic.md` must define its takeaway, first-look focus, evidence/support, and viewer action (when applicable), including why each asset has its chosen scale and position.
+- Every `deck` page must follow the independent visual criteria in [references/deck-visual-design-standard.md](references/deck-visual-design-standard.md). This standard is for page-based decks only; it does not define `film` art direction.
+- Every `deck` page must also pass the art-direction judgment in [references/deck-art-direction.md](references/deck-art-direction.md). The art-direction layer governs visual taste, point of view, restraint, and memorable composition; it is not a fixed template or a replacement for production checks.
 - `deck.html` and `film.html` are render artifacts, not text sources.
 - The spoken master comes before theme extraction, storyboard, screen text, and motion planning. Do not design a page and then write narration to justify it.
-- Before any paid, remote, cloned, or token-heavy TTS call, create a local motion-and-subtitle preview from `Narration` and get user approval. Do not spend TTS calls on text that has not passed narration, cue, and subtitle review.
+- Before any paid, remote, cloned, or token-heavy TTS call, complete the static layout review, the no-audio animation demonstration, and the local-audio synchronized animation review. Do not spend TTS calls on a page that has not passed these reviews.
 - Before approving `narration-script.md`, run a continuous read-aloud pass. This may adapt article prose for speech while preserving approved claims, examples, order, and author stance.
-- Every visual event that explains spoken content must be driven by narration/subtitle cues. A timeline must not finish its explanation before the corresponding words are spoken, and it must not continue introducing unrelated events while the narration has moved on.
+- In audio-synchronized modes and final export, every visual event that explains spoken content must be driven by the audio/subtitle cue clock. The no-audio animation demonstration is intentionally self-timed and is only a motion-quality review; it is not evidence of narration synchronization.
 - SVG motion eligibility must be explicit. Color classes such as red, blue, ink, muted, or wash describe appearance only; they must never automatically opt a path into stroke-dash animation. Mark only genuine semantic routes, contours, connectors, brackets, and handwritten strokes as drawable. Filled paths, background washes, and structural silhouettes remain visible as part of the entry scaffold.
-- Audio timing is the final clock after formal TTS. Before formal TTS, use narration-derived timing or a fast local preview audio source. Replace both with measured formal audio timing before recording.
+- The no-audio animation demonstration uses its own deterministic timeline. Local-audio review uses the provisional audio clock; after formal TTS, rebuild cue and subtitle timing from the measured formal audio before recording.
 - After TTS, do not enter `?preview=1` with duration-weighted subtitle estimates. First generate a timestamp artifact from the real audio, normally `subtitles.json` for browser preview and `subtitles.srt` for final video.
 - Whisper or another timestamp tool provides timing only. Display subtitle text still comes from the active frozen specs' `Narration`, unless the user explicitly approved a subtitle text edit.
 - Spotlight/focus is a general semantic motion pattern. Use it when one composition contains several related items: the narrated item receives contrast, color, scale, a light field, or a moving focus mark while non-active items remain present but visually subordinate.
-- Use the `Spotlight 2.0` rules in [references/deck-design-and-html.md](references/deck-design-and-html.md) whenever a slide has sequentially explained items. The project currently supports only two final-state modes: `peer` and `result`. Each spoken cue must move the viewer's attention to the corresponding visual; do not reveal every explanatory element at the start unless that is the intended meaning.
+- Use the `Spotlight 2.0` rules in [references/deck-design-and-html.md](references/deck-design-and-html.md) whenever a slide has sequentially explained items. The project currently supports only two final-state modes: `peer` and `result`. Map each spoken cue to its corresponding visual state. Audio-synchronized modes change focus at that cue; the no-audio demonstration may stage the mapped states independently. Do not reveal every explanatory element at the start unless that is the intended meaning.
 - Check text and labels against circles, paths, strokes, and connectors in every important animation state. DOM bounding boxes alone cannot prove that SVG geometry is collision-free.
-- Every deck approval preview must provide one persistent playback rail in the upper-right, plus keyboard controls for pause/resume and page navigation. Include current-page replay and full-deck replay; navigation must switch visuals, narration audio, subtitles, and cue-driven animation as one synchronized unit. Do not add competing page-level play buttons.
-- Treat the browser composition as a deterministic, seekable render surface. Manual preview, audio-driven preview, timestamp screenshots, diagnostics, and final export must resolve the same visual state from the same absolute time; do not maintain a second animation implementation for recording.
-- For decks and long films, render independent page/scene segments into a persistent, content-addressed cache. Re-render only cache misses and affected transition segments, then assemble from cached video and audio; do not recapture the entire timeline for a local edit. Follow [references/incremental-rendering.md](references/incremental-rendering.md).
+- Every interactive deck approval preview must provide one persistent playback rail in the upper-right, plus keyboard controls for pause/resume and page navigation. In audio-bound modes, navigation must switch visuals, narration audio, subtitles, and cue-driven animation as one synchronized unit. Static layout review may expose navigation without playback; no-audio animation review may expose replay without pretending that subtitles drive the motion. Do not add competing page-level play buttons.
+- Treat the browser composition as a deterministic, seekable render surface with one shared visual-state resolver. Static review resolves a still; no-audio demonstration uses its independent timeline; local/formal audio review and export use the audio-bound cue timeline. Timestamp screenshots and diagnostics must use the appropriate mode's absolute time. Do not maintain a second animation implementation for recording.
+- Give every deck page a stable `unitId` that is independent of its displayed page number. Preserve that identity through storyboard/spec mapping, subtitles, audio units, timeline manifests, diagnostics, and render cache; inserting or reordering pages changes placement, not identity.
+- For decks and long films, render independent page/scene content into a persistent, content-addressed cache. In decks, keep order-dependent page numbers and progress chrome in a separate transparent overlay cache; compose that overlay with cached page content before assembling. A local visual edit must not recapture unrelated page frames. Follow [references/incremental-rendering.md](references/incremental-rendering.md). For a deck that exposes `getDeckRenderUnits()`, `prepareDeckUnit(id)`, deterministic `seekDeckUnit(id, localTime)`, and a render-overlay API, use the reusable [`scripts/render_deck_incrementally.mjs`](scripts/render_deck_incrementally.mjs) helper.
+- Treat archiving as a deliberate lifecycle transition. The default archive is
+  an editable archive: it must preserve enough source, stable unit metadata,
+  active HTML, formal audio, timing, and renderer information to revise one
+  page/scene and assemble a new complete video without reconstructing the
+  project from chat history.
+- Before an archive cleanup, generate an inventory that separates required
+  editable artifacts, final deliverables, external shared dependencies, and
+  regenerable cleanup candidates. Do not remove a cache, audio intermediate,
+  review artifact, source file, or Git history merely because the project has
+  been delivered or the user said "clean up".
+- Render caches, preview audio, screenshots, temporary diagnostics, and obsolete
+  variants are cleanup candidates, not automatically disposable files. Removing
+  them may increase the cost of the next revision; record that consequence and
+  preserve the page/scene unit mapping so a later edit can still be selective.
+- A project archive must keep the latest approved baseline rather than every
+  historical experiment. Retain the active source chain and the final
+  deliverable; list older alternatives explicitly before proposing their
+  removal.
 - Every active HTML artifact must expose a machine-readable timeline contract: active unit, absolute start/end, local time, subtitle/cue state, and readiness status. Prefer `window.seekFilm(seconds)` for `film` and `window.seekDeck(seconds)` or an equivalent absolute-time API for `deck`.
 - Animation state must be derived from absolute time or an explicit cue state, not from the number of callbacks that happened to run. Avoid wall-clock-only sequencing, uncontrolled randomness, DOM-arrival order, and hidden page-local timers.
 - A render or preview must be diagnosable without watching the whole video. Preserve a compact timeline/diagnostic manifest with unit boundaries, cue anchors, asset readiness, validation results, and any known exception.
@@ -97,37 +137,118 @@ When `Production Format: film`, read and follow [references/film-mode.md](refere
 - After conversion, pace only at authored sentence, semicolon, paragraph, or clear idea boundaries. Keep the converted delivery intact inside each sentence, add short leading/trailing edge silence, and inspect the result by ear. The target is calm, supported, and naturally varied: neither machine-gun delivery nor artificially slow reading.
 - Before recording, the browser preview is the screening room.
 
-## Pipeline
+## User-Facing Workflow
+
+The user-facing workflow has fifteen steps. Frozen specifications, hashes,
+cue manifests, and cache signatures are internal production mechanisms, not
+additional user approval stages.
+
+1. **Confirm project scope.** Confirm the source, workdir, execution mode
+   (`auto` or `semi-auto`), production format (`deck` or `film`), title,
+   audience, narration perspective, brand mark, and required links or
+   promotional instructions.
+2. **Check the production environment.** Probe the required skills, browser,
+   animation assets, TTS options, local audio capability, timestamp tool,
+   ffmpeg, subtitle support, and background rendering. Stop and report
+   blockers instead of silently substituting tools.
+3. **Confirm the source material.** Preserve the article, script, images,
+   screenshots, and links in the confirmed workdir. Ask the user to confirm
+   that the source is complete before analysis begins.
+4. **Review the content understanding.** Confirm the core claim, audience,
+   structure, viewer path, visual opportunities, pacing, and risks.
+5. **Review the narration script.** Confirm the narration perspective, wording,
+   order, claims, examples, tone, terminology, read-aloud continuity, and
+   estimated duration.
+6. **Choose and review the visual theme.** Ask for a theme skill, design
+   reference, image, template, or an explicit no-theme decision. Confirm the
+   extracted color, typography, graphic language, density, and motion attitude.
+7. **Review the storyboard.** Confirm the page or scene order, screen text,
+   narration mapping, visual relation, and animation intent. Only after this
+   approval may the agent freeze specs and build the active HTML.
+8. **Review static layout.** Open `?review=1` or an equivalent static review.
+   Show the relevant subtitle/narration text, but do not play audio or animate
+   the page. Render the active HTML at output resolution; apply the visual
+   review gates and art-direction taste tests. Compare a changed page with its
+   previous and next rendered pages. Check text hierarchy and size, image role
+   and scale, composition, spacing, collision, containment, and safe areas.
+   Treat a failed design gate as a blocker even if automated diagnostics pass;
+   do not approve from source inspection or stale screenshots.
+9. **Review the no-audio animation demonstration.** Open
+   `?motionPreview=1`. Keep subtitles visible, but run animation on its own
+   deterministic demonstration timeline. Animation does not wait for subtitle
+   boundaries, and this mode is not evidence of synchronization. Check motion
+   quality, sequence, focus, smoothness, and settled states.
+10. **Review animation with local audio.** Open `?audioPreview=1` with
+    provisional local audio. The audio clock drives subtitles, semantic cues,
+    animation, and page/scene completion. Check actual narration tracking,
+    pauses, cue timing, and transitions.
+11. **Choose and generate formal audio.** Select the formal TTS or cloned-voice
+    channel, probe it, generate per-unit audio, and review voice identity,
+    energy, prosody, pauses, noise, and unit-to-unit consistency.
+12. **Build precise timing and subtitles.** Use the exact formal audio to
+    generate durations, subtitle timestamps, cue timing, and the global
+    timeline. Display text continues to come from the approved narration.
+    This is a deterministic timing build and QA report, not a second visual
+    design approval.
+13. **Review the formal synchronized preview.** Open `?preview=1` with formal
+    audio and precise timestamps. Recheck audio, subtitles, animation,
+    pause/resume, navigation, replay, controls, collision, and the full run.
+    This is the approval gate before rendering.
+14. **Render and assemble incrementally.** Compare dependency signatures,
+    render only missing or affected page/scene segments, assemble the final
+    mix, and produce `output.mp4`. Report the cache plan and affected-unit
+    scope before expensive work; do not ask for a new approval when the
+    approved preview and render plan are unchanged.
+15. **Validate and deliver.** Check encoded streams, duration, subtitles in
+    pixels, first and representative frames, black frames, loudness, and
+    audio/video drift. Deliver the video, diagnostics, and known exceptions.
+
+The review modes are deliberately distinct:
+
+| Mode | URL | Audio | Subtitle role | Animation clock |
+|---|---|---|---|---|
+| Static layout | `?review=1` | None | Visible review text | No animation |
+| No-audio animation | `?motionPreview=1` | None | Visible review text; may advance independently | Independent demonstration timeline |
+| Local-audio sync | `?audioPreview=1` | Provisional local audio | Driven by audio time | Audio and cue timeline |
+| Formal sync | `?preview=1` | Approved formal audio | Driven by exact timestamps | Formal audio and cue timeline |
+
+## Internal Pipeline
+
+The following is the implementation path behind the fifteen user-facing steps.
+It is not a second approval checklist:
 
 ```
-confirm workdir + execution mode + production format
+project-config.md + environment-check.md
   ↓
-project-config.md
-  ↓
-environment-check.md
-  ↓
-article.md
+confirmed source snapshot and assets
   ↓
 content-understanding.md
   ↓
-narration-script.md
+approved narration-script.md
   ↓
 theme-extraction.md
   ↓
-storyboard.md
-  ↓ freeze and branch
+approved storyboard.md
+  ↓
+freeze specs + write visual/motion logic + build HTML
   ├─ deck → slide-specs/ → visual-logic.md → deck.html
   └─ film → scene-specs/ → motion-logic.md → film.html
   ↓
-local motion/subtitle preview
+static layout review
   ↓
-fast local audio preview (optional but recommended)
+no-audio animation demonstration
   ↓
-formal TTS audio/ + durations + precise subtitles
+local-audio synchronized animation
   ↓
-?preview=1
+formal voice/audio
   ↓
-output.mp4
+measured timing + subtitles + cue manifest
+  ↓
+formal synchronized review
+  ↓
+incremental render + assembly
+  ↓
+validated output.mp4 + delivery report
 ```
 
 In `semi-auto` mode, pause for user feedback after each arrow's destination artifact is created and checked. In `auto` mode, continue ordinary arrows without waiting, while preserving the same artifacts and safety checkpoints.
@@ -171,9 +292,10 @@ workdir/
 │   └── subtitle-alignment.md
 ├── subtitles.json
 ├── subtitles.srt
-├── timeline-manifest.json     # deterministic unit/cue/render contract
+├── timeline-manifest.json     # deterministic stable-unit/cue/render contract
 ├── render-manifest.json       # content signatures, cached segments, and validation
 ├── render-cache/              # reusable per-unit video/audio segments; never auto-delete
+├── archive-manifest.md        # archived projects: retained files and cleanup decisions
 ├── deck-diagnostics.json      # deck validation report, deck only
 ├── film-diagnostics.json      # time-based validation report, film only
 └── output.mp4
@@ -181,7 +303,7 @@ workdir/
 
 Use two-digit slide or scene numbers: `01`, `02`, ... Do not add redundant prefixes inside folders. Create only the branch selected in `project-config.md`; do not create both sets of empty artifacts.
 
-Keep durable workflow artifacts so another agent can inspect, resume, or explain the work. Before removing any project artifact or temporary data, list the exact paths and ask the user for explicit approval; do not treat delivery or "cleanup" as deletion authorization.
+Keep durable workflow artifacts so another agent can inspect, resume, or explain the work. For an archived project, read [references/archive-and-cleanup.md](references/archive-and-cleanup.md) and write `archive-manifest.md` before proposing cleanup. Before removing any project artifact or temporary data, list the exact paths and ask the user for explicit approval; do not treat delivery or "cleanup" as deletion authorization.
 
 ## Artifact Contract
 
@@ -190,7 +312,7 @@ The workflow must be able to resume from files alone.
 Source artifacts:
 
 - `project-config.md`: user-confirmed absolute `workdir`, execution mode, source pointer, and current workflow status.
-- `article.md`: original source, never rewritten.
+- `article.md` or the chosen source snapshot: original source, never rewritten.
 - `narration-script.md`: user-approved continuous spoken master, divided into semantic beats.
 - `storyboard.md`: user-approved visual, screen-text, motion, and narration mapping master for the chosen production format.
 - `environment-check.md`: local dependency and capability record.
@@ -216,6 +338,7 @@ Derived artifacts:
 - `subtitles.srt`
 - `timeline-manifest.json`
 - `render-manifest.json` and `render-cache/`: content-addressed render segments and their signatures, frame counts, settings, and validation results. Keep them across revisions; never clean them up automatically.
+- `archive-manifest.md`: required only after the project enters archive state. It records the archive baseline, retained editable chain, final deliverables, external shared dependencies, cleanup candidates, approved removals, and the expected regeneration cost.
 - `deck-diagnostics.json` or `film-diagnostics.json`
 - `output.mp4`
 - `audio-preview/` files are provisional and must never be used as formal narration, final mix, or final subtitle timing.
@@ -224,7 +347,7 @@ Derived artifacts may be regenerated. When an upstream artifact changes, downstr
 
 Staleness rules:
 
-- `article.md` change invalidates every downstream artifact.
+- A change to the confirmed source snapshot invalidates every downstream artifact.
 - `content-understanding.md` change invalidates `narration-script.md` and everything after it unless the user explicitly confirms the old narration still applies.
 - `narration-script.md` change invalidates `storyboard.md`, the active frozen specs, the active logic file, the active HTML file, local subtitle preview, TTS audio for affected passages, timing, subtitles, preview, and recording.
 - A narration change also invalidates `audio-preview/`, its durations, cue timing, and any preview that used it.
@@ -251,12 +374,18 @@ Dependency policy:
 - After every installation, run the probe again. Do not continue until the probe passes.
 - If installation needs network access or elevated permissions, ask the user before running it.
 - Record installed tools, versions, and any local asset paths in `environment-check.md`.
-- If the user's goal is a final video, run a full-video environment check before Step 1. Phase-by-phase checks are only acceptable when the user explicitly wants to stop before audio or recording.
+- If the user's goal is a final video, run the full capability check during
+  User Step 2. Phase-by-phase checks are only acceptable when the user
+  explicitly wants to stop before audio or recording.
 
-Required capabilities:
+Quality capabilities:
 
-- visual constraint checking for layout, overlap, safe areas, and animation states
-- frontend-quality review for typography, composition, density, and visual hierarchy
+- visual constraint checking for layout, overlap, safe areas, and animation
+  states, supplied by a companion skill, equivalent tool, or documented manual
+  review
+- frontend-quality review for typography, composition, density, and visual
+  hierarchy, supplied by a companion skill, equivalent tool, or documented
+  manual review
 
 Optional theme sources:
 
@@ -271,7 +400,7 @@ Common system tools:
 - Node.js / npm, when a local HTTP server, Playwright tooling, or JS helpers are needed
 - ffmpeg, for audio concatenation, muxing, subtitles, and transcoding
 - Playwright or another browser automation tool, for browser preview and recording
-- TTS tool selected by the user at the Step 10 voice-source gate; do not install or assume one before that choice
+- TTS tool selected by the user at the User Step 11 voice-source gate; do not install or assume one before that choice
 - optional fast local preview voice, such as macOS `say`, when available; this is a pacing probe and does not replace the selected formal TTS channel
 - timestamp/transcription tool, such as Whisper or another word/subtitle timestamp generator
 - local HTTP server, when browser audio loading or preview mode cannot work from `file://`
@@ -284,7 +413,7 @@ node --version
 npm --version
 ffmpeg -version
 python3 --version
-# Probe the selected formal TTS command or API adapter only at Step 10.
+# Probe the selected formal TTS command or API adapter only at User Step 11.
 # Probe a fast local preview voice separately when available, for example:
 command -v say
 say -v Tingting -o /tmp/film-forge-tts-probe.aiff "快速语音预览"
@@ -298,10 +427,11 @@ Suggested install guidance for missing tools:
 - ffmpeg: install through the user's package manager, such as Homebrew on macOS.
 - Playwright: install with npm in the user's preferred tool location, then run the browser install step required by Playwright.
 - GSAP: install or download locally through npm, then copy or reference the local `gsap.min.js` in the working directory or a known local asset path. Generated HTML must load this local file, not a CDN URL.
-- TTS: install or configure only the channel selected at Step 10. A free online candidate may use `edge-tts`, while local/offline or custom API channels need their own documented probe.
+- TTS: install or configure only the channel selected at User Step 11. A free online candidate may use `edge-tts`, while local/offline or custom API channels need their own documented probe.
 - Fast preview audio: prefer an already-installed local speech command. On macOS, `say` is a suitable provisional source; do not present its voice as the formal TTS choice.
 - Whisper/timestamp tool: install only when precise subtitle timestamps are needed; until then, use measured slide audio duration and narration-based subtitle splitting.
 - Prefer an isolated tool environment for heavy timestamp tools such as `whisper-timestamped`, WhisperX, or forced-alignment libraries. Do not install them into the user's main Python/Conda environment when they may change NumPy, SciPy, PyTorch, numba, or llvmlite versions.
+- When the shared `logamee-whisper` launcher is available, use it for all projects. It uses the user-level environment at `~/.local/share/logamee/whisper/venv` and model cache at `~/.cache/whisper`; do not copy Whisper into each workdir unless an incompatible version is explicitly required.
 
 Installation shape:
 
@@ -314,6 +444,69 @@ Installation shape:
 
 Do not install dependencies silently unless the user asks for auto setup. If a tool is missing, tell the user which tool their agent should install, why it is needed, which step is blocked, and which probe must pass afterward.
 
+## Archive and Cleanup Constraint
+
+Archiving is a storage and lifecycle decision after delivery. It must not
+change the meaning of the fifteen production steps or silently rewrite the
+approved production baseline.
+
+The default archive is the **editable archive**. It preserves:
+
+- `project-config.md`, `environment-check.md`, and `archive-manifest.md`
+- the confirmed source and approved content/narration/theme/storyboard chain
+- active frozen specs and the active `visual-logic.md` or `motion-logic.md`
+- the active production HTML and the latest approved review HTML when they are
+  different artifacts, with their relationship recorded
+- editable assets, stable `unitId` mappings, cue/timeline manifests, and
+  diagnostics
+- formal per-unit audio, final mix, durations, subtitle files, alignment
+  records, and the latest validated `output.mp4`
+- the renderer scripts and local runtime assets needed to rebuild the active
+  HTML; shared tools and models remain outside the project when they are shared
+  by multiple projects, with their versions and paths recorded in
+  `environment-check.md`
+
+The following may be proposed as cleanup candidates after inspection:
+
+- `render-cache/`, old cache generations, transparent overlay caches, and
+  duplicate render manifests
+- `audio-preview/` and other provisional local-voice outputs
+- intermediate presenter-source, raw-clone, converted-voice, denoise, and
+  pacing files that are not the approved formal audio
+- obsolete HTML variants, abandoned review pages, superseded screenshots,
+  temporary contact sheets, and stale diagnostic exports
+- duplicate or superseded final videos when one validated delivery baseline is
+  explicitly identified
+
+For every candidate, record its exact relative path, purpose, size, whether it
+can be regenerated, what future workflow it affects, and the expected
+regeneration cost. In particular, deleting `render-cache/` saves space but
+removes the fast path for the next page-level change; it must never be
+described as cost-free.
+
+The archive operation has four mandatory phases:
+
+1. **Inspect.** Read the project manifest, active HTML, render/timeline
+   manifests, diagnostics, Git status, and file sizes. Identify the latest
+   approved baseline and all stable units.
+2. **Write the archive manifest.** Create `archive-manifest.md` with the
+   retained baseline, external dependencies, candidate paths, and recovery
+   notes. The manifest must explain how to edit one page/scene and regenerate
+   the complete video.
+3. **Propose.** Show the user a path-level cleanup table. Distinguish
+   "retain", "candidate for removal", and "needs user decision". Do not treat
+   an archive request as deletion approval.
+4. **Remove only after approval.** Delete only the exact paths the user
+   explicitly approves. Afterward, update `archive-manifest.md`, project
+   status, measured size, and the next-revision regeneration plan.
+
+Never use `git archive` as a substitute for a complete project archive when
+the worktree contains ignored media or other untracked deliverables. Do not
+remove `.git` or rewrite history as part of routine archive cleanup. If the
+user explicitly requests a history-free cold archive, report the loss of local
+history and verify that all ignored final media and editable sources have been
+copied or retained elsewhere first.
+
 ## Phase Router
 
 Load the phase reference before doing detailed work; do not carry the full pipeline into every task.
@@ -322,20 +515,23 @@ Load the phase reference before doing detailed work; do not carry the full pipel
 |---|---|
 | Project setup, environment, source understanding, narration, or theme | [project-setup-and-source.md](references/project-setup-and-source.md) |
 | Storyboard, narration mapping, or frozen specs | [storyboard-and-freeze.md](references/storyboard-and-freeze.md) |
-| Deck composition, semantic motion, HTML build, or visual QA | [deck-design-and-html.md](references/deck-design-and-html.md), plus [FORM-MAP.md](references/FORM-MAP.md) and [TOOLKIT.md](references/TOOLKIT.md) as needed |
+| Deck composition, semantic motion, HTML build, or visual QA | [deck-art-direction.md](references/deck-art-direction.md), [deck-design-and-html.md](references/deck-design-and-html.md), and [deck-visual-design-standard.md](references/deck-visual-design-standard.md), plus [FORM-MAP.md](references/FORM-MAP.md) and [TOOLKIT.md](references/TOOLKIT.md) as needed |
 | Continuous film production | [film-mode.md](references/film-mode.md) and [TOOLKIT.md](references/TOOLKIT.md) |
 | Audio, cloned voice, subtitle timing, or synchronized preview | [audio-review-and-sync.md](references/audio-review-and-sync.md); also read [tts-source-selection.md](references/tts-source-selection.md) and [cloned-voice-video-production.md](references/cloned-voice-video-production.md) when relevant |
 | Reviewing or revising an approval HTML | [approval-preview-workflow.md](references/approval-preview-workflow.md) |
 | Approved final render and delivery | [render-and-delivery.md](references/render-and-delivery.md) and [incremental-rendering.md](references/incremental-rendering.md); read [hyperframes-adaptation.md](references/hyperframes-adaptation.md) for deterministic timeline/render work |
+| Archiving or cleaning a delivered project | [archive-and-cleanup.md](references/archive-and-cleanup.md) |
 
 ## Approval Preview Contract
 
 Treat the review HTML as a distinct approval artifact, not as the final recording. Keep approved production HTML and audio intact while a revision is under review. Do not promote a page proof into shared templates, the full deck, or final rendering until the user approves it.
 
-Read [references/approval-preview-workflow.md](references/approval-preview-workflow.md) for the complete review protocol. The preview must let the user review the actual narration, subtitles, and cue-driven HTML animation together. Report the active preview artifact, what changed, and what was actually verified.
+Read [references/approval-preview-workflow.md](references/approval-preview-workflow.md) for the complete review protocol. Keep the four review modes distinct: static layout shows subtitles without motion or audio; the no-audio demonstration shows subtitles while motion follows an independent demonstration timeline; local-audio review synchronizes subtitles and motion to provisional audio; formal review uses approved audio and exact timestamps. Report the active preview artifact, what changed, and what was actually verified.
 
 ## Scope and Data Safety
 
 - For a page-specific request, change only the active review artifact unless the user explicitly asks to update production outputs.
 - After any audio replacement, regenerate timing and subtitles from that exact audio; never reuse stale alignment because the duration looks similar.
 - Never delete project files, recordings, screenshots, caches, or temporary artifacts without explicit user approval of the exact paths.
+- When a project is archived, follow the editable-archive rules above and keep
+  the archive manifest synchronized with every approved cleanup operation.

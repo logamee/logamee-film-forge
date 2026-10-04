@@ -1,8 +1,8 @@
 ---
 name: logamee-html-constraint
 description: |
-  Quality constraint layer for HTML-based presentations and auto-video decks.
-  Use with logamee-film-forge after deck.html generation to enforce readable
+  Quality constraint layer for HTML-based presentations and content-driven
+  video decks. Use with logamee-film-forge after HTML generation to enforce readable
   typography, spacing, contrast, local dependencies, GSAP timelines, no emoji,
   subtitle overlay rules, theme-token discipline, and semantic visual expression.
   This skill is a contract, not a design system.
@@ -12,14 +12,19 @@ description: |
 
 This skill checks HTML presentation/video output. It is not a theme, template, or layout authority. The content plan comes from `storyboard.md` / `slide-specs/`; visual skin comes from `theme-extraction.md`; this file enforces minimum quality.
 
-An optional frontend-quality review may be used before this check as an aesthetic reference layer. It can improve composition, typography hierarchy, spatial rhythm, visual focus, and anti-generic aesthetics. It cannot override this contract.
+An optional frontend-quality review may be used before this check as a
+design-quality reference layer. It can improve composition, typography
+hierarchy, spatial rhythm, visual focus, and anti-generic aesthetics. It cannot
+override this contract.
 
 ## Inputs
 
 - `deck.html`
 - `theme-extraction.md`
 - `slide-specs/`
-- `../logamee-film-forge/references/TOOLKIT.md`
+- the active project's local HTML/CSS/SVG/GSAP stack; when
+  `logamee-film-forge` is available, its `references/TOOLKIT.md` is a useful
+  optional reference
 
 If `deck.html` contains text that conflicts with `slide-specs/`, fix `deck.html`. Do not treat HTML as the text source.
 
@@ -100,7 +105,8 @@ Forbidden:
 
 ## Frontend Quality Boundary
 
-When an aesthetic review is used, treat it as an advisor, not as a new design system.
+When an aesthetic review is used, treat it as an advisor, not as a new design
+system.
 
 Allowed:
 
@@ -208,6 +214,17 @@ Forbidden:
 - relying on motion to pass through unreadable or overlapping states
 - hidden relationship lines that only appear as stray borders, edge fragments, or unclear strokes around cards
 
+### Collision Validation Contract
+
+Collision checks are release gates, not advisory diagnostics.
+
+- Validate the actual active HTML artifact under review. A validator must accept or derive the active filename; it must not silently inspect a hardcoded stale `deck.html` when the review uses another generated HTML file.
+- Mark independently positioned semantic objects with machine-checkable bounds such as `data-collision-item`. Check object-object, text-text, text-line, text-overlay, viewport, and semantic-parent containment collisions.
+- Fail closed: any detected unintended collision must make validation fail. Reporting collision candidates while returning success does not satisfy this contract.
+- An intentional overlap needs a shared, named annotation on the exact participating elements. Do not use broad slide-level ignore flags or silently exempt all descendants of a container.
+- For a changed slide, check `0%`, every narration-owned cue state, and `100%`. For final delivery, also check `25%`, `50%`, and `75%` across the complete deck.
+- Subtitle, review-note, page-number, brand, and other overlay regions must participate in collision checks whenever they are visible in the reviewed mode.
+
 ## Screen Text and Subtitles
 
 Screen text is the visual skeleton. Subtitles are the spoken/readable layer.
@@ -242,9 +259,21 @@ In the final still-frame review, flag any text element that appears to be a rema
 
 In non-audio review mode, subtitles may be split by punctuation and displayed by estimated duration. Estimate each subtitle segment from its own visible length, not by dividing the slide duration equally across all segments. For Chinese teaching narration, use a recorded project rate when available; otherwise default to about 5 visible characters per second, with small punctuation pauses and min/max clamps for readability. In video/preview mode after TTS, subtitles must first be recalibrated against the measured audio duration of each slide; if word-level or sentence-level timestamps are later generated, use them to refine the schedule.
 
-Audio preview mode must be usable as a checkpoint, not only as a hidden recording path. If `?preview=1` is present, provide an explicit start control so the browser has a user gesture before audio playback. Preview mode may add this control, audio wiring, and timing logic, but it must not alter the static slide layout used for visual review.
+The four review modes, when implemented by the active project, must keep their
+roles distinct:
 
-Before TTS, provide a local subtitle-and-slide preview that does not read or play audio. A mode such as `?subtitlePreview=1` should use `Narration`, estimated speaking rate, natural text segmentation, estimated slide duration, and a short inter-slide pause so the user can approve subtitle wording, visual matching, and rough rhythm before any remote or expensive TTS call.
+- `?review=1`: static layout only; no audio and no animation.
+- `?motionPreview=1`: no-audio animation demonstration on an independent
+  deterministic timeline.
+- `?audioPreview=1`: provisional local-audio synchronization; the audio clock
+  drives subtitles, cues, animation, and unit completion.
+- `?preview=1`: formal-audio synchronization using exact timing artifacts.
+
+`?audioPreview=1` and `?preview=1` must provide an explicit start control so
+the browser has a user gesture before audio playback. These modes may add
+controls, audio wiring, and timing logic, but must not alter the static slide
+layout used for visual review. A separate subtitle-only mode, if a project
+implements one, is an internal alias and not an additional approval stage.
 
 After TTS exists, preview timing must use the measured audio files. Slide advance should listen for the audio `ended` event and then hold a small pause before entering the next slide, with the measured duration only as a fallback. Subtitle segments may still be split from `Narration` before real word-level timestamps exist, but their display schedule must be scaled to the measured duration of the current slide rather than a fixed global character-speed estimate.
 
@@ -330,6 +359,8 @@ Check every slide:
 - [ ] Screen text carries the main visual claim; subtitles carry detail and nuance
 - [ ] Subtitle overlay is compact and readable
 - [ ] Final animation state has no overlap or covered text
+- [ ] The validator inspected the active HTML filename and failed on every unintended text, object, overlay, or containment collision
+- [ ] Independently positioned semantic objects expose machine-checkable collision bounds; any intentional overlap uses a narrow shared named exemption
 - [ ] Every content slide was captured at 0%, 25%, 50%, 75%, and 100%; no state contains compressed text, half-visible glyphs, collisions, or elements passing through readable content
 - [ ] Every bordered/background semantic container passed child-vs-parent containment checks; no card, dashed shell, panel, or framed system has visible descendants crossing its border
 - [ ] A defect found on one slide triggered a deck-wide scan for the same animation or composition pattern

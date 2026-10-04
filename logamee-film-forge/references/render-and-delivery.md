@@ -4,11 +4,11 @@ Read this reference only after the user approves the synchronized browser previe
 
 ## Contents
 
-- [Step 13: Background Render and Assemble](#step-13-background-render-and-assemble)
-- [Step 14: Deliver](#step-14-deliver)
+- [User Step 14: Render and Assemble](#user-step-14-render-and-assemble)
+- [User Step 15: Validate and Deliver](#user-step-15-validate-and-deliver)
 - [Change Rules](#change-rules)
 
-## Step 13: Background Render and Assemble
+## User Step 14: Render and Assemble
 
 Inputs: approved active HTML, `audio/NN.*`, `audio/durations.json`, `subtitles.json`, `subtitles.srt`.
 
@@ -65,9 +65,16 @@ After assembly, verify more than metadata:
   repeated-seek or frame-level check instead of treating a successful encode as
   proof of visual correctness
 
-After a successful assembly, do not automatically delete render-only caches or temporary files. If cleanup is useful, first list each exact path, its purpose, and whether it can be regenerated; wait for the user's explicit approval of those paths before deleting anything. Preserve `article.md`, `content-understanding.md`, `narration-script.md`, `theme-extraction.md`, `storyboard.md`, the active frozen specs, the active logic file, the active HTML, `gsap.min.js`, approved audio files, duration records, subtitle files, alignment notes, `audio/final-mix.*`, and `output.mp4`.
+After a successful assembly, do not automatically delete render-only caches or
+temporary files. If cleanup is useful, first list each exact path, its purpose,
+and whether it can be regenerated; wait for the user's explicit approval of
+those paths before deleting anything. Preserve the confirmed source snapshot,
+`content-understanding.md`, `narration-script.md`, `theme-extraction.md`,
+`storyboard.md`, the active frozen specs, the active logic file, the active
+HTML, `gsap.min.js`, approved audio files, duration records, subtitle files,
+alignment notes, `audio/final-mix.*`, and `output.mp4`.
 
-## Step 14: Deliver
+## User Step 15: Validate and Deliver
 
 Output the `output.mp4` path and note any skipped verification.
 
@@ -80,8 +87,8 @@ Output the `output.mp4` path and note any skipped verification.
 - If the active logic file is missing or stale after storyboard changes, regenerate it before rebuilding the active HTML.
 - If active HTML text differs from active frozen specs, fix the HTML; do not treat it as a source.
 - If theme changes, regenerate `theme-extraction.md`, rebuild the active HTML, and preview again.
-- If production format changes, return to Step 5 and rebuild the storyboard and every downstream artifact in the new branch.
-- If narration changes, return to Step 3 and rebuild the storyboard mapping, frozen specs, TTS, timing, subtitles, preview, and recording.
+- If production format changes, return to User Step 7 and rebuild the storyboard and every downstream artifact in the new branch.
+- If narration changes, return to User Step 5 and rebuild the storyboard mapping, frozen specs, TTS, timing, subtitles, preview, and recording.
 - If a visual change affects only one slide, run targeted validation for that slide, its cue states, and adjacent transitions, then rebuild only its cache segment and dependent transition segments. Do not perform a full-deck screenshot sweep unless a shared implementation or final-delivery check requires it.
 - If the cue resolver, subtitle renderer, shared timeline helper, stage transform, global chrome, shared CSS, or common rendering runtime changes, invalidate dependent segments and run full-deck or full-film regression. The final MP4 still needs reassembly, but a full browser rerender is required only when the cache dependency check says every segment is stale.
 - If only the absolute start time of a page/scene changes because an earlier unit got longer or shorter, preserve its local-time visual cache. Rebuild the ordered timeline/mix and final MP4; invalidate that unit only if its local duration, cues, subtitles, or local animation behavior changed.

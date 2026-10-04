@@ -4,15 +4,16 @@ Read this reference when mapping approved narration into deck slides or film sce
 
 ## Contents
 
-- [Step 5: Storyboard](#step-5-storyboard)
+- [User Step 7: Storyboard](#user-step-7-storyboard)
 - [Decisions](#decisions)
 - [Cover Frame - Title](#cover-frame---title)
 - [Slide 01 - Title](#slide-01---title)
-- [Step 6: Freeze Storyboard](#step-6-freeze-storyboard)
+- [Internal: Freeze Storyboard](#internal-freeze-storyboard)
 
-## Step 5: Storyboard
+## User Step 7: Storyboard
 
-Inputs: `article.md`, `content-understanding.md`, approved `narration-script.md`, `theme-extraction.md`.
+Inputs: the confirmed source snapshot, `content-understanding.md`, approved
+`narration-script.md`, and `theme-extraction.md`.
 
 Output: `storyboard.md`.
 
@@ -115,9 +116,9 @@ Every spotlight sequence should define the states it can enter:
 **Transition behavior**
 
 - Coordinate at least two visual properties, such as fill, stroke, contrast, scale, edge accent, light field, underline, or relationship-line activation. A lone opacity change is not a sufficient spotlight.
-- Make the narration-to-visual handoff easy to follow: the active item should change when its spoken cue arrives, while the surrounding structure remains legible. If the selected design uses a brief shake or nudge instead of spotlight, apply it only to the item currently named and keep it restrained.
+- Make the narration-to-visual handoff easy to follow: in audio-synchronized modes, the active item changes when its spoken cue arrives, while the surrounding structure remains legible. The no-audio demonstration may stage the same handoffs on its independent timeline. If the selected design uses a brief shake or nudge instead of spotlight, apply it only to the item currently named and keep it restrained.
 - Use a short overlap between outgoing and incoming focus. Do not blank the whole composition before lighting the next item.
-- A typical handoff is `0.0–0.2s` soft release, `0.2–0.6s` focus travel and emphasis transfer, then a readable hold until the next spoken cue. Adjust to the actual voice pace.
+- A typical handoff is `0.0–0.2s` soft release, `0.2–0.6s` focus travel and emphasis transfer, then a readable hold. In audio-synchronized modes, hold until the next spoken cue; in the no-audio demonstration, use the independent demonstration timeline.
 - The focus should be gentle and controlled: avoid bounce, abrupt pop, oversized scale, or decorative glow that competes with the narration.
 - Keep the active item visually stronger without making inactive context unreadable. The audience should always understand both “what is being discussed” and “where it belongs”.
 - When the visual has a meaningful path or connector, animate that relation instead of placing a generic spotlight over unrelated text.
@@ -127,8 +128,8 @@ Every spotlight sequence should define the states it can enter:
 **Cue contract**
 
 - Each focus change must have an exact spoken anchor in the slide's `Narration` or `Cue Map`.
-- Do not pre-play the entire focus sequence on slide entry. Slide entry may establish `base`; semantic emphasis waits for its cue.
-- Hold the active state while the corresponding phrase is being spoken. Move on only when the next cue begins.
+- Do not pre-play the entire focus sequence on slide entry. Slide entry may establish `base`; the no-audio demonstration may then play the mapped states independently, while audio-synchronized modes wait for each cue.
+- In audio-synchronized modes, hold the active state while the corresponding phrase is being spoken and move on when the next cue begins. The no-audio demonstration uses its own deterministic holds and transitions.
 - If one spoken sentence names several items, either define sub-cues for the named phrases or use one composition-level emphasis. Do not invent a faster visual sequence than the speech supports.
 
 **Review questions**
@@ -137,7 +138,9 @@ Every spotlight sequence should define the states it can enter:
 - Is the current focus unmistakable without obscuring the surrounding structure?
 - Does the motion explain a sequence, comparison, hierarchy, or relationship?
 - Would the slide still make sense if the labels were temporarily hidden?
-- Does each meaningful change occur with the corresponding subtitle cue?
+- Does the no-audio demonstration preserve the planned cue order without
+  implying synchronization, and do audio-synchronized modes change state at
+  the corresponding spoken cue?
 
 ### Qualified Slide Contract
 
@@ -218,14 +221,17 @@ literal layout.
 
 **Exact cue ownership**
 
-- Every explanatory animation has one exact spoken owner. Record the anchor and give
-  it a dedicated `timelineTime`; use `timelineSpan` when the action must visibly grow
-  during the phrase.
+- Every explanatory animation has one exact spoken owner. Record the anchor in the
+  `Cue Map`. Audio-synchronized modes assign it a `timelineTime`; use `timelineSpan`
+  when the action must visibly grow during the phrase. The no-audio demonstration
+  assigns deterministic demonstration timing without changing cue order.
 - Never drive a semantic slide only with generic subtitle-percentage progress. A
   percentage jump can instantly complete a path or reveal a conclusion before the
   narration reaches it.
-- Slide entry establishes only `base`. The first semantic action waits for its spoken
-  cue, and the final conclusion waits for the narration's concluding phrase.
+- Slide entry establishes only `base`. Audio-synchronized modes wait for the first
+  spoken cue and hold the final conclusion for the narration's concluding phrase.
+  The no-audio demonstration may play the same mapped states on its independent
+  timeline.
 
 **Persistent context and controlled contrast**
 
@@ -264,7 +270,8 @@ Cover rules:
 - It is not counted as a content slide.
 - It enters the final video timeline before Slide 01.
 - Default duration is about 3 seconds.
-- The cover must show the topic title clearly. If the user did not provide one, derive it from `article.md` and `content-understanding.md`.
+- The cover must show the topic title clearly. If the user did not provide one,
+  derive it from the confirmed source snapshot and `content-understanding.md`.
 - Do not add narration or subtitle to the cover unless the user explicitly asks for a spoken opening.
 - The cover is a static frame. It must have no entrance animation, path drawing, fade-in, text reveal, highlight animation, or delayed element appearance.
 - The cover must be complete and readable at `0s`. This first frame is also the file thumbnail / preview cover on macOS Finder and Quick Look.
@@ -299,7 +306,7 @@ Narration and subtitle rules:
 
 Human checkpoint required.
 
-## Step 6: Freeze Storyboard
+## Internal: Freeze Storyboard
 
 Input: confirmed `storyboard.md`.
 
