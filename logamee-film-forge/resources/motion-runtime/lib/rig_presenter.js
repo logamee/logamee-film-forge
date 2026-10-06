@@ -2,13 +2,13 @@
 // 角色定规：白帽、圆框眼镜、浅色上衣、短裤、运动鞋、简洁比例（头≈全身 38%）。
 // 坐标：本地单位 1 = 设定图侧视 1px；原点 = 双脚之间的地面；y 向上为负；原生朝左（-x 为前）。全身高 740 单位。
 // 用法：
-//   const H = PRESENTER.build({ x, y, s: 0.6, face: 1 /*1朝右 -1朝左*/, pose: PRESENTER.pose('walk', phase) });
-//   PRESENTER.draw(c, H, pal)             // 默认扁平画法；pal.mode: 'fill' | 'line' | 'both'
+//   const H = PRESENTER_RIG.build({ x, y, s: 0.6, face: 1 /*1朝右 -1朝左*/, pose: PRESENTER_RIG.pose('walk', phase) });
+//   PRESENTER_RIG.draw(c, H, pal)             // 默认扁平画法；pal.mode: 'fill' | 'line' | 'both'
 //   H.parts = [{ name, role, path, z }]  // 按画序；role ∈ skin/shirt/shorts/hat/hair/shoe/watch/glass/line
 //   H.J = { hip, knee1, ankle1, toe1, knee2, ..., shoulder1, elbow1, wrist1, ..., neck, head, hatTop, mouth, eye }
 // 角度约定：0 = 自然下垂；正 = 往脸朝的方向（前）转；简洁比例手够不到头顶：举手=近侧手臂向前上(~1.9)、远侧向后上(~-1.9)，侧视里成 V 字，不要直上。1 = 近侧肢体（画在最前），2 = 远侧。
 (() => {
-const HS = window.PRESENTER = {};
+const HS = window.PRESENTER_RIG = {};
 const { lerp, clamp } = U;
 const D = (a, b, c, d, e, f) => new DOMMatrix([a, b, c, d, e, f]);
 const P2 = (pts, closed = true) => (RIG && RIG.smooth) ? RIG.smooth(pts, closed) : (() => { const p = new Path2D(); pts.forEach((q, i) => i ? p.lineTo(...q) : p.moveTo(...q)); if (closed) p.closePath(); return p; })();

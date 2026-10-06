@@ -304,12 +304,12 @@ Y1.shot3 = (c, lt, t) => {
   layer(c, cam, 1, g => {
     flat(g, poly([[-300, 900], [400, 860], [1000, 880], [1600, 850], [2300, 900], [2300, 1400], [-300, 1400]]), P.ground, '#3d8f33', P.groundHi, [0, -14], [0, 5]);
     // 花叔：指向黑猫（point 姿势＋手臂与头的小幅持续摆动，嘴在说话）
-    if (HERO.y1(g, ft) === false) {                                             // 形象方向见 lib/hero.js
-    const HSb = HUASHU.build({ x: 470, y: 900 + Math.sin(ft * 3.2) * 2, s: 0.66, face: 1, pose: HUASHU.pose('point', 0, { ua1: 1.38 + 0.07 * Math.sin(ft * 3.4), fa1: 0.05 + 0.05 * Math.sin(ft * 3.4 + 1), head: -0.04 + 0.03 * Math.sin(ft * 2.1), mouth: 0.45 + 0.4 * Math.max(0, Math.sin(ft * 9)) }) });
+    if (PRESENTER.y1(g, ft) === false) {                                        // 角色路由见 demos/_shared/presenter.js
+    const HSb = PRESENTER_RIG.build({ x: 470, y: 900 + Math.sin(ft * 3.2) * 2, s: 0.66, face: 1, pose: PRESENTER_RIG.pose('point', 0, { ua1: 1.38 + 0.07 * Math.sin(ft * 3.4), fa1: 0.05 + 0.05 * Math.sin(ft * 3.4 + 1), head: -0.04 + 0.03 * Math.sin(ft * 2.1), mouth: 0.45 + 0.4 * Math.max(0, Math.sin(ft * 9)) }) });
       const pal = { skin: '#ffd3b4', hair: '#1f1a3a', shirt: '#ffffff', shorts: '#d9c9a8', hat: '#ffffff', hatBand: '#d8d4f2', shoe: '#f4f2ff', watch: '#2a2550' };
       const shade = { skin: '#f0a98a', hair: '#120f26', shirt: '#cfcbee', shorts: '#b39f7c', hat: '#d3cff0', hatBand: '#b6b0e0', shoe: '#c9c5ea', watch: '#14112b' };
       for (const p of HSb.parts) flat(g, p.path, pal[p.role] || pal.skin, shade[p.role] || shade.skin, '#ffffff', [-10, -8], [-4, -3]);
-      HUASHU.details(g, HSb, { line: '#1f1a3a', lw: 3.5, glass: '#1f1a3a', cheek: 'rgba(255,120,120,.35)', earLine: 'rgba(200,110,90,.7)', shoeHole: '#8a86b8' });
+      PRESENTER_RIG.details(g, HSb, { line: '#1f1a3a', lw: 3.5, glass: '#1f1a3a', cheek: 'rgba(255,120,120,.35)', earLine: 'rgba(200,110,90,.7)', shoeHole: '#8a86b8' });
     }
     // 认识的那只橙猫蹲在花叔脚边；镜头要认的是一只「没见过的」黑猫
     Y1.cat(g, 790, 905, ft + 0.3, { s: 0.55, face: -1, look: 0.5 });

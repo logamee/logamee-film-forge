@@ -10,9 +10,103 @@ const EIGHTH = 60 / (window.BPM || 128) / 2;   // 0.234375s @128；片子可设 
 // 段长：eighths（八分音符数，卡节拍）或 dur（秒，按口播切的解说片）。写了 dur 就以 dur 为准。
 let acc = 0;
 for (const e of ERAS) { e.t0 = acc; acc += e.dur != null ? e.dur : e.eighths * EIGHTH; e.t1 = acc; }
-// 片长 = 最后一段的 t1；window.FILM_DURATION 优先。render.py / 预览都读 window.__total。
+// 片长 = 最后一段的真实 t1；window.FILM_DURATION 优先。render.py /
+// 预览和增量渲染都读 window.__total。最后一段不能拉到无限长，否则
+// 单元边界、直接 seek 和缓存帧数都会失真。
 window.__total = window.FILM_DURATION || ERAS[ERAS.length - 1].t1;
-ERAS[ERAS.length - 1].t1 = 1e9;
+if (window.FILM_DURATION != null) {
+  const last = ERAS[ERAS.length - 1];
+  if (last && last.t1 < window.__total) last.t1 = window.__total;
+}
+
+// Motion Unit 是渲染、字幕、诊断和缓存共享的稳定身份。显示顺序可以改，
+// unitId 不应因为插入或重排而改变。
+const motionUnit = (e, index) => ({
+  unitId: e.unitId || e.id || `unit-${index + 1}`,
+  index,
+  title: e.title || e.label || e.id || `Unit ${index + 1}`,
+  start: e.t0,
+  end: e.t1,
+  duration: Math.max(0, e.t1 - e.t0),
+  transition: e.transition ? {
+    type: e.transition.type || 'cut',
+    duration: (e.transition.dur || 0) + (e.transition.delay || 0),
+    dependsOn: index > 0 ? [ERAS[index - 1].unitId || ERAS[index - 1].id] : []
+  } : null,
+  grammar: e.grammar || null,
+  style: e.style || null,
+  route: e.route || null,
+  assets: [...(e.assets || []), ...(e.plate ? [e.plate] : [])],
+  renderRevision: e.renderRevision || 0,
+});
+const MOTION_UNITS = ERAS.map(motionUnit);
+const byUnitId = id => MOTION_UNITS.find(u => u.unitId === id);
+const unitAt = t => {
+  let k = ERAS.findIndex(e => t >= e.t0 && t < e.t1);
+  if (k < 0) k = t >= window.__total ? ERAS.length - 1 : 0;
+  return { era: ERAS[k], unit: MOTION_UNITS[k], index: k };
+};
+let motionState = {
+  unitId: MOTION_UNITS[0]?.unitId || null,
+  unitIndex: 0,
+  absoluteTime: 0,
+  localTime: 0,
+  absoluteStart: MOTION_UNITS[0]?.start || 0,
+  absoluteEnd: MOTION_UNITS[0]?.end || 0,
+  duration: MOTION_UNITS[0]?.duration || 0,
+  subtitle: null,
+  cue: null,
+  readiness: 'booting',
+  ready: false,
+};
+const cueStateAt = t => {
+  const resolver = window.resolveMotionCue || window.getMotionCueState;
+  if (typeof resolver !== 'function') return null;
+  try { return resolver(t) || null; } catch (err) {
+    console.warn('motion cue resolver failed:', err);
+    return { error: String(err?.message || err) };
+  }
+};
+const subtitleStateAt = t => {
+  const resolver = window.resolveMotionSubtitle || window.getMotionSubtitleState;
+  if (typeof resolver === 'function') {
+    try { return resolver(t) || null; } catch (err) {
+      console.warn('motion subtitle resolver failed:', err);
+      return { error: String(err?.message || err) };
+    }
+  }
+  const subtitles = window.SUBTITLES || window.subtitles || [];
+  if (!Array.isArray(subtitles)) return null;
+  return subtitles.find(s => t >= (s.start ?? s.t0 ?? 0) && t < (s.end ?? s.t1 ?? 0)) || null;
+};
+const updateMotionState = (t, index = unitAt(t).index) => {
+  const u = MOTION_UNITS[index] || MOTION_UNITS[0];
+  const absoluteTime = U.clamp(Number(t) || 0, 0, window.__total);
+  motionState = {
+    ...motionState,
+    unitId: u?.unitId || null,
+    unitIndex: index,
+    absoluteTime,
+    localTime: u ? U.clamp(absoluteTime - u.start, 0, u.duration) : 0,
+    absoluteStart: u?.start || 0,
+    absoluteEnd: u?.end || 0,
+    duration: u?.duration || 0,
+    subtitle: subtitleStateAt(absoluteTime),
+    cue: cueStateAt(absoluteTime),
+    readiness: window.__bootFailed ? 'failed' : (window.__ready ? 'ready' : 'booting'),
+    ready: window.__ready === true && !window.__bootFailed,
+  };
+  window.__motionState = motionState;
+  return motionState;
+};
+window.getMotionRenderUnits = () => MOTION_UNITS.map((u, i) => ({
+  ...u,
+  startFrame: Math.round(u.start * (window.RENDER_FPS || 60)),
+  endFrame: Math.round(u.end * (window.RENDER_FPS || 60)),
+  dependsOn: i > 0 ? [MOTION_UNITS[i - 1].unitId] : [],
+}));
+window.getMotionState = () => ({ ...motionState });
+window.motionReady = false;
 
 // 离屏缓冲：A=上一段，B=当前段
 const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
@@ -36,6 +130,9 @@ async function boot() {
   for (const e of ERAS) if (e.init) e.init(IMG);
   checkCounterGlyphs();
   window.__ready = true;
+  window.motionReady = true;
+  motionState.readiness = 'ready';
+  motionState.ready = true;
   renderFrame(0);
 }
 window.IMG = IMG;
@@ -248,11 +345,33 @@ function renderFrame(t) {
     drawEra(ctx, e, t, prev);
   }
   if (window.GLOBAL_OVERLAY) window.GLOBAL_OVERLAY(ctx, t);
+  updateMotionState(t, k);
   return k;
 }
 window.renderFrame = renderFrame;
 // 单段预览：opt.counter = false 不画角标（自检量帧差时计数器滚动会抬高数字——迁移测试 B）
 window.renderSolo = function (id, lt, opt = {}) { const e = ERAS.find(x => x.id === id); if (!e) throw new Error('renderSolo: 没有这一段 ' + id); const k = ERAS.indexOf(e); drawEra(ctx, e, e.t0 + lt, ERAS[k - 1], undefined, opt.counter === false); };
+window.prepareMotionUnit = async function (unitId) {
+  const u = byUnitId(unitId);
+  if (!u) throw new Error(`prepareMotionUnit: unknown unit ${unitId}`);
+  const endSample = Math.max(u.start, u.end - 1 / (window.RENDER_FPS || 60));
+  await Promise.all([prepare(u.start), prepare(endSample)]);
+  updateMotionState(u.start, u.index);
+  return { ...u, ready: true };
+};
+window.seekMotionUnit = function (unitId, localTime = 0) {
+  const u = byUnitId(unitId);
+  if (!u) throw new Error(`seekMotionUnit: unknown unit ${unitId}`);
+  const lt = U.clamp(Number(localTime) || 0, 0, u.duration);
+  const absoluteTime = U.clamp(u.start + lt, 0, window.__total);
+  renderFrame(absoluteTime);
+  return window.getMotionState();
+};
+window.seekMotion = function (seconds = 0) {
+  const absoluteTime = U.clamp(Number(seconds) || 0, 0, window.__total);
+  renderFrame(absoluteTime);
+  return window.getMotionState();
+};
 
 // ---------- 预览 UI ----------
 if (location.search.includes('render=1')) document.body.classList.add('render');

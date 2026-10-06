@@ -222,10 +222,10 @@ Y2.shot3 = (c, lt, t) => {
   const sq = clamp((st - 0.6) / 0.6);
   if (sq > 0) {
     const e = MO.quartOut(sq);
-    const pose = HUASHU.pose('point', 0, { ua1: 1.35 + 0.12 * Math.sin(st * 5), head: -0.05 + 0.04 * Math.sin(st * 3), mouth: 0.5 + 0.4 * Math.sin(st * 9) });
-    const HS = HUASHU.build({ x: 0, y: 0, s: 0.82, face: -1, pose });
+    const pose = PRESENTER_RIG.pose('point', 0, { ua1: 1.35 + 0.12 * Math.sin(st * 5), head: -0.05 + 0.04 * Math.sin(st * 3), mouth: 0.5 + 0.4 * Math.sin(st * 9) });
+    const HS = PRESENTER_RIG.build({ x: 0, y: 0, s: 0.82, face: -1, pose });
     const pal = { skin: '#f3c9a8', hair: '#171716', shirt: '#eeedeb', shorts: '#cdbf9f', hat: '#eeedeb', hatBand: '#b8433f', shoe: '#e8e4da', watch: '#171716', line: '#171716', lw: 5 };
-    const sp = PAINT.scratch('y2hs'), g = sp.getContext('2d'); g.reset(); if (!HERO.y2(g, st)) { g.translate(1500, 1040); HUASHU.draw(g, HS, pal); g.setTransform(1, 0, 0, 1, 0, 0); }
+    const sp = PAINT.scratch('y2presenter'), g = sp.getContext('2d'); g.reset(); if (!PRESENTER.y2(g, st)) { g.translate(1500, 1040); PRESENTER_RIG.draw(g, HS, pal); g.setTransform(1, 0, 0, 1, 0, 0); }
     const sil = CL.stickerEdge(sp, 'y2sil', 12, '#f4f2ec');          // 剪纸贴纸：外扩 12px 的纸白边
     c.save(); c.translate(1500 + 1100 * (1 - e), 1040 + 120 * (1 - e)); c.rotate(0.02 + 0.21 * (1 - Math.min(1, e * 1.15))); c.translate(-1500, -1040);
     c.drawImage(sil, 0, 0); c.drawImage(sp, 0, 0); c.restore();

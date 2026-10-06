@@ -83,24 +83,24 @@ const END2 = B.cur;
 // ===== 第三块（相机 5.1→6.05 平滑斜移；手在 5.8 就入画开画） =====
 B.at(5.35);
 // VideoScribe 的 Reveal 画法——完整线稿藏在下面，笔尖从上往下走 8 行之字形，笔过之处揭开（笔尖永远在揭开的前沿上）
-const huashu = () => { const [x, y] = L3(500, 1010); return HUASHU.build({ x, y, s: 0.95 * K3, face: 1, pose: HUASHU.pose('point', 0, { ua1: 1.25, mouth: 0.8 }) }); };
+const presenter = () => { const [x, y] = L3(500, 1010); return PRESENTER_RIG.build({ x, y, s: 0.95 * K3, face: 1, pose: PRESENTER_RIG.pose('point', 0, { ua1: 1.25, mouth: 0.8 }) }); };
 const rigZig = (HSb) => { if (rigZig.c) return rigZig.c; const js = Object.values(HSb.J).filter(v => Array.isArray(v)); const xs = js.map(v => v[0]), ys = js.map(v => v[1]);
   const x0 = Math.min(...xs) - 70, x1 = Math.max(...xs) + 50, y0 = Math.min(...ys) - 20, y1 = Math.max(...ys) + 40, rows = 8;
   rigZig.rowH = (y1 - y0) / rows; const zz = DG.zigzag(x0, y0, x1 - x0, y1 - y0, rows); return (rigZig.c = { zz, cum: DG.cum(zz) }); };
 const RIG3 = { t0: B.cur, t1: B.cur + 0.7 };
 B.push({ kind: 'custom', t0: RIG3.t0, t1: RIG3.t1,
   draw(g, q, ft) {
-    const HSb = huashu(), { zz, cum } = rigZig(HSb), d = cum[cum.length - 1] * q;
+    const HSb = presenter(), { zz, cum } = rigZig(HSb), d = cum[cum.length - 1] * q;
     g.save(); if (q < 1) g.clip(DG.revealMask(zz, cum, d, rigZig.rowH * 2.2)); g.lineJoin = 'round'; g.lineCap = 'round';   // 揭完就不再裁：之字形拐角处的三角会漏掉
     const [fx, fy] = L3(500, 1010);
-    if (!HERO.y3(g, fx, fy, 0.95 * K3 * 740, ft)) {
+    if (!PRESENTER.y3(g, fx, fy, 0.95 * K3 * 740, ft)) {
       for (const p of HSb.parts) { g.fillStyle = p.role === 'hair' ? INK : BOARD; g.fill(p.path); g.strokeStyle = INK; g.lineWidth = LW * 0.9; g.stroke(p.path); }
-      HUASHU.details(g, HSb, { line: INK, lw: 4.5, glass: INK, cheek: null, earLine: 'rgba(0,0,0,.5)', shoeHole: INK });
+      PRESENTER_RIG.details(g, HSb, { line: INK, lw: 4.5, glass: INK, cheek: null, earLine: 'rgba(0,0,0,.5)', shoeHole: INK });
     }
     g.restore();
     return q < 1 ? DG.pointAt(zz, cum, d) : null;
   },
-  start() { return rigZig(huashu()).zz[0]; }, end() { const z = rigZig(huashu()).zz; return z[z.length - 1]; } });
+  start() { return rigZig(presenter()).zz[0]; }, end() { const z = rigZig(presenter()).zz; return z[z.length - 1]; } });
 B.at(RIG3.t1 + 0.03);
 catStrokes(...L3(1150, 900), K3 * 0.95, SPEED * 1.6, LW, false);
 B.line([L3(1000, 330), L3(1070, 400), L3(1240, 200)], { col: ORANGE, w: LW + 2, speed: SPEED * 1.5, smooth: false });
