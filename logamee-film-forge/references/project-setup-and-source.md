@@ -139,7 +139,14 @@ The mode applies to the whole project unless the user explicitly changes it. If 
 Production formats:
 
 - `deck`: discrete slides, static opening cover by default, slide-local timelines, and visible page transitions.
-- `film`: Scenes and Shots, an intentional opening shot, one deterministic global timeline, and continuous or motivated cinematic transitions.
+- `motion`: code-rendered scenes and stable motion units, designed keyframes,
+  and authored visual movement rather than presentation-page changes.
+- `remotion`: reserved placeholder; the renderer is not implemented. If chosen,
+  explain the limitation and stop before creating renderer-specific artifacts.
+- `film` (legacy): Scenes and Shots, an intentional opening shot, one
+  deterministic global timeline, and continuous or motivated cinematic
+  transitions. Keep this value when resuming existing projects; do not offer it
+  as a new mode unless the user explicitly asks for it.
 
 The production format applies to the storyboard and every downstream artifact.
 If the user changes it, record the decision, invalidate the old storyboard and
@@ -165,7 +172,7 @@ current request or stored in `project-config.md`:
   motion quality, sequence, and settled states. Do not report this as a
   synchronization approval.
 - **User Step 10:** approve whether provisional local audio, subtitles, cues,
-  animation, and page transitions are synchronized.
+  animation, and page/scene/motion-unit transitions are synchronized.
 - **User Step 11:** choose the formal TTS source and voice, then approve
   formal audio quality.
 - **User Step 13:** approve `?preview=1` before recording.
@@ -174,16 +181,23 @@ current request or stored in `project-config.md`:
   path and record the decision.
 
 At User Step 1, confirm whether the video needs a recurring brand mark. In
-`deck`, it may be footer-like chrome. In `film`, integrate it into
-opening/closing identity or the visual world rather than repeating page chrome.
-Do not assume the topic title is also the brand mark.
+`deck`, it may be footer-like chrome. In `film` or `motion`, integrate it
+into the opening/closing identity or the visual world rather than repeating
+page chrome. Do not assume the topic title is also the brand mark.
 
 Rules:
 
 - Confirm narration perspective before writing `narration-script.md`. If the source article contains first-person experience, do not rewrite it into "the author says" without asking.
 - If the user has not selected a theme, stop at User Step 6 and ask whether they want to specify one. Do not assume "no external theme".
 - If the user declines a theme, still create `theme-extraction.md` and record `Source Theme: None selected by user`.
-- Before writing `storyboard.md`, ask for an optional topic title. In `deck`, it becomes the main cover title. In `film`, it informs the opening identity but need not appear as a static title card. If the user leaves it empty, derive it from the confirmed source snapshot and `content-understanding.md`. Separately ask whether the video should carry a brand mark. Do not use the topic title as the brand mark unless the user explicitly says so. If the user does not provide a brand mark, record `Brand Mark: None provided`.
+- Before writing `storyboard.md`, ask for an optional topic title. In `deck`,
+  it becomes the main cover title. In `film` or `motion`, it informs the
+  opening identity but need not appear as a static title card. If the user
+  leaves it empty, derive it from the confirmed source snapshot and
+  `content-understanding.md`. Separately ask whether the video should carry a
+  brand mark. Do not use the topic title as the brand mark unless the user
+  explicitly says so. If the user does not provide a brand mark, record
+  `Brand Mark: None provided`.
 - If the user chooses auto mode, still write decisions into files. Auto mode
   removes routine pauses, not explicit decisions or required review gates.
 - If a decision is made in chat, copy it into the relevant artifact before continuing.
@@ -199,13 +213,22 @@ Ask the user three questions first:
 
 - Which exact directory should be the project `workdir`?
 - Which execution mode should this project use: `auto` or `semi-auto`?
-- Which production format should this project use: `deck` or `film`?
+- Which production format should this project use: `deck`, `motion`, or
+  the reserved `remotion` placeholder?
 
 The user must explicitly confirm all three values. Do not infer the directory from the current working directory, the source article location, a previous demo, or a directory mentioned only as an example.
 
+If the user selects `remotion`, record the choice and explain that this format
+is reserved but not implemented. Do not create a fake Remotion project, silently
+substitute `deck` or `motion`, or proceed to rendering. Existing projects
+whose config already says `film` remain supported through the legacy branch.
+
 After confirmation:
 
-1. Verify that the chosen directory exists or create only the confirmed empty project directory, `audio/`, and the selected frozen-spec directory: `slide-specs/` for `deck` or `scene-specs/` for `film`.
+1. Verify that the chosen directory exists or create only the confirmed empty
+   project directory, `audio/`, and the selected frozen-spec directory:
+   `slide-specs/` for `deck`, `scene-specs/` for legacy `film`, or
+   `motion-specs/` for `motion`.
 2. Write `project-config.md` at the project root before any other project artifact:
 
 ```md
@@ -219,8 +242,9 @@ After confirmation:
 - Rule: auto continues ordinary steps; semi-auto waits for user feedback after every numbered step.
 
 ## Production Format
-- Format: deck | film
-- Rule: deck uses slides and page transitions; film uses Scenes/Shots and one global deterministic timeline.
+- Format: deck | motion | remotion
+- Legacy Format: film (only when resuming a project already configured that way)
+- Rule: deck uses slides and page transitions; motion uses authored code-rendered scenes and stable motion units; remotion is reserved and not implemented.
 
 ## Source
 - Input:
@@ -239,7 +263,9 @@ Then confirm the remaining scope:
 - source input: pasted text, URL content, or file path
 - narration perspective: first-person author voice, objective explanatory voice, or third-person report voice
 - theme skill/theme/template style, or explicit no-theme choice
-- optional topic title: the prominent cover title in `deck`, or the opening identity title in `film`. If the user leaves it empty, derive it from the source content.
+- optional topic title: the prominent cover title in `deck`, or the opening
+  identity for `film`/`motion`. If the user leaves it empty, derive it from
+  the source content.
 - optional brand mark: whether the video should carry an identifier, the exact text if yes, and whether to include a URL such as `www.example.com`. Leave it empty when the user does not provide one.
 - TTS preference: record `Not selected yet` unless the user already made an explicit choice. The binding formal voice-source gate runs at User Step 11. The local-audio sync review at User Step 10 uses a provisional local audio source and does not make the formal voice choice.
 - recording path: prefer ffmpeg-burned subtitles; fall back to HTML subtitles when libass is unavailable

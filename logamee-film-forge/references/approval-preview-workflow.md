@@ -5,8 +5,11 @@ Use this reference when reviewing or revising an HTML video before the user appr
 ## Keep Review and Production Separate
 
 - Treat the approval preview as a review artifact, not as approval to record or update shared templates.
-- For a page-specific revision, limit changes to that page in the review copy or an isolated proof. Preserve approved production HTML, audio, and unaffected pages.
-- Show the change in the full review HTML when the user needs to judge its fit with neighboring pages.
+- For a page- or motion-unit-specific revision, limit changes to that unit in
+  the review copy or an isolated proof. Preserve approved production HTML,
+  audio, and unaffected units.
+- Show the change in the full review HTML when the user needs to judge its fit
+  with neighboring pages, scenes, or motion units.
 - Promote the approved revision to production HTML or shared systems only after explicit user approval.
 - If the narration, voice, subtitles, or timing changes, regenerate every dependent alignment artifact from the exact current audio.
 
@@ -20,7 +23,8 @@ The review artifact has four explicit modes:
    review text, but run animation on its own deterministic demonstration clock.
    Do not claim that this mode proves narration synchronization.
 3. `?audioPreview=1`: local-audio synchronized review. Use provisional local
-   audio to drive subtitles, cues, animation, and page/scene completion.
+   audio to drive subtitles, cues, animation, and page/scene/motion-unit
+   completion.
 4. `?preview=1`: formal synchronized review. Use approved formal audio and
    exact timestamps to drive the same audio-bound behavior as `audioPreview`.
 
@@ -49,14 +53,18 @@ runtime supports keyboard input:
 - `ArrowLeft` or `ArrowUp`: previous page
 - `S`: show or hide the current page's complete narration/subtitle note
 
+For continuous and motion previews, replace page navigation with current
+unit/time status and deterministic seek or replay controls. Do not add a page
+rail to make a continuous composition look like a deck.
+
 Do not add a second play button in the page body, including a large center or
 lower-page play button. Hide all review controls in final render mode.
 
 In `audioPreview` and formal `preview`, navigation, pause, and replay must
 update the visual timeline, narration audio, subtitles, and cue state together.
-Stop the previous page's audio before starting another page. Replay must reset
-all four tracks to the same beginning. Static and no-audio modes must not
-pretend that subtitle changes drive the animation.
+Stop the previous page or unit's audio before starting another page or unit.
+Replay must reset all four tracks to the same beginning. Static and no-audio
+modes must not pretend that subtitle changes drive the animation.
 
 ## Audio-Bound Synchronized Review
 
@@ -66,7 +74,8 @@ The review HTML must use the actual approved audio for the selected project, inc
 - Confirm the audio is not muted, blocked, or silently failing; inspect browser errors and the current audio asset revision.
 - Show subtitles sourced from the active frozen specs and timed from the exact current audio. A valid subtitle file alone does not prove that subtitles appear in the page.
 - Drive cue animations and subtitles from the same audio clock. Do not let the animation flash through its states independently of the spoken passage.
-- Pause, resume, page navigation, and replay must keep audio, subtitles, and animation aligned.
+- Pause, resume, page or unit navigation, and replay must keep audio, subtitles,
+  and animation aligned.
 - Listen to the rendered preview when audio quality or synchronization is under review. Do not report audio as verified merely because an audio file exists.
 
 If audio or subtitle alignment is regenerated, refresh its duration, timestamp data, cue timing, cache revision, and preview manifest before review. Never reuse old alignment because the replacement audio has a similar duration.
@@ -87,16 +96,18 @@ Design each page from its concept. A visual reference can inform line quality, d
 
 ## Static Design Gate
 
-Apply [Deck Visual Design Standard](deck-visual-design-standard.md) and
-[Deck Art Direction](deck-art-direction.md) to the actual active HTML, not an
-older capture or source-only impression. For each page, verify that the
+For `deck`, apply [Deck Visual Design Standard](deck-visual-design-standard.md)
+and [Deck Art Direction](deck-art-direction.md) to the actual active HTML, not
+an older capture or source-only impression. For each page, verify that the
 rendered first-look hierarchy matches its declared takeaway, focal anchor,
-evidence, and viewer action.
+evidence, and viewer action. For `motion`, apply the keyframe and motion
+gates in [motion-mode.md](motion-mode.md) to the actual rendered
+states.
 
-- Compare a changed page with its immediately previous and next pages at the
-  same output resolution. The composition may differ, but the deck's
-  typography, margins, spacing rhythm, and recurring chrome must remain
-  coherent.
+- Compare a changed page or motion unit with its immediately neighboring
+  rendered content at the same output resolution. A deck's typography, margins,
+  spacing rhythm, and recurring chrome must remain coherent; a motion
+  sequence must preserve its stated material and camera logic.
 - If a screenshot is supporting evidence, keep its scale subordinate by
   default and use the documented exception only when the screenshot itself is
   the primary subject.
@@ -119,7 +130,8 @@ Collision clearance is a blocking visual-review requirement. Check text, labels,
   transitions. In audio-bound review, inspect each spoken cue boundary as well
   as representative intermediate states and the settled state.
 - Check the transitions as well as static screenshots. A line or label can cross an object only while moving.
-- Check subtitle-safe space, viewport edges, and neighboring-page transitions in the full deck.
+- Check subtitle-safe space, viewport edges, and neighboring-page or
+  motion-unit transitions in the full composition.
 - If any unintended collision remains, revise the page and repeat the checks before reporting it ready.
 
 ## Completion Report

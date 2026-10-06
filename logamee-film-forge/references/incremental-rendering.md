@@ -1,11 +1,17 @@
 # Incremental Rendering
 
-Use this contract for multi-page decks and long films that may receive revisions. The goal is to pay browser-rendering and video-encoding cost only for changed visual units. Rebuilding the final MP4 is expected after an approved change; recapturing every browser frame is not.
+Use this contract for multi-page decks, motion films, and long legacy
+films that may receive revisions. The goal is to pay browser-rendering and
+video-encoding cost only for changed visual units. Rebuilding the final MP4 is
+expected after an approved change; recapturing every browser frame is not.
 
 ## Render Units
 
 - In `deck`, the default unit is one cover or one slide, rendered on its own local clock.
 - In `film`, use an independently seekable scene, shot, or fixed-duration range. Keep continuous-motion ranges large enough to include their authored context.
+- In `motion`, the default unit is one stable motion unit or an explicitly
+  bounded transition range. A unit may contain multiple shots, but it must
+  expose a deterministic local seek function and a stable semantic ID.
 - Assign each unit a stable ID such as `cover`, `intro`, or `concept-01`.
   Never use its current deck position as identity. Keep display page number and
   absolute start frame as separate manifest fields.
@@ -14,16 +20,23 @@ Use this contract for multi-page decks and long films that may receive revisions
 - Store each unit's visual segment without audio. Keep audio segments and the final mix as separate artifacts so sound-only edits never trigger browser capture.
 - Make unit boundaries explicit in integer output frames. The timeline manifest owns the mapping between unit-local time and ordered output frames; avoid accumulated rounding drift from independently rounding every duration.
 - In a page-based HTML deck, expose a machine-readable list of stable units and a deterministic local seek API. A practical contract is `getDeckRenderUnits()`, `prepareDeckUnit(unitId)`, and `seekDeckUnit(unitId, localTime)`. The last API must set the same composition used by the interactive review; it must not start wall-clock playback or load audio.
+- In `motion`, expose the equivalent
+  `getMotionRenderUnits()`, `prepareMotionUnit(unitId)`, and
+  `seekMotionUnit(unitId, localTime)` contract. `seekMotionUnit` must derive
+  the frame from absolute local time and must not depend on earlier frames,
+  audio playback, or a running animation callback.
 
 ## Cache Signatures
 
 Use SHA-256 signatures and record them in `render-manifest.json`. A cache entry is reusable only when its signature matches and the segment file still passes basic media validation.
 
-Each page/scene content signature includes:
+Each page/scene/motion-unit content signature includes:
 
 - renderer/cache schema version, resolution, frame rate, pixel format, codec, and encoding settings
 - shared dependencies: global CSS, fonts, timeline/seek runtime, cue resolver, subtitle renderer, and common assets that can affect page-content pixels
 - unit-local markup/specification, local animation/cue mapping, local subtitle text and timing, local duration/frame range, and hashes of every asset used by that unit
+- for `motion`, the motion-code modules, deterministic seed, material
+  parameters, generated-layer metadata, and any explicit renderer revision
 - the stable unit ID and an explicit per-unit render revision for behavior that cannot be observed from markup, timeline structure, or deterministic state samples
 
 Keep audio signatures separate. A page's audio waveform can change without changing its visual signature if local duration, subtitle timing, cue timing, and page boundary behavior are unchanged. If any of those timing inputs change, that page's visual segment is stale as well.
@@ -41,17 +54,25 @@ For a bundled HTML deck, a useful compromise is to hash the shared shell, shared
 
 Absolute placement in the full video is not a visual dependency. If an earlier slide changes duration, later segments can still be reused when their own local inputs and local frame count are unchanged. Recompute only their ordered placement, the assembled audio timeline, and the final mux.
 
+For motion, distinguish a local visual duration change from an absolute
+start-time shift. A changed unit duration invalidates that unit and dependent
+boundaries. A pure shift caused by an earlier unit changing does not invalidate
+the later unit when its local frame count, cue state, and local composition are
+unchanged.
+
 ## Invalidation Policy
 
 | Change | Rebuild |
 |---|---|
 | One slide's artwork, layout, or page-local animation | That slide's visual segment, its validation, and any transition segments that depend on it |
+| One motion unit's drawing, material, camera, or local animation | That motion unit, its validation, and any boundary transition that depends on it |
 | One page's subtitle text or local subtitle timing | That page's visual segment if subtitles are burned into the segment; otherwise subtitle artifact and final assembly |
 | One page's audio waveform, with unchanged duration and timing | That audio unit, final mix, and final mux; keep all visual segments |
 | One page's narration duration, cue timing, or local timeline | That page's audio/timing artifacts and visual segment; reassemble the mix and final MP4 |
 | Earlier page duration changes, later pages' local timelines unchanged | Changed page and dependent boundaries; rebuild ordered audio/mux; reuse later visual segments |
 | Insert or reorder a deck page | Recompute order-dependent overlays and their composited segments; reuse unaffected page-content segments |
 | Shared CSS/runtime, global chrome, font, cue resolver, subtitle renderer, resolution, or frame rate | All segments that depend on the changed shared input, then full regression |
+| Shared Canvas/SVG renderer, geometry helper, material library, camera math, or deterministic seed policy | All dependent motion units, then full motion regression |
 | Final validation failure isolated to a unit or join | That segment or boundary and its affected checks; do not rerender unrelated units |
 
 ## Build Protocol

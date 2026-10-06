@@ -1,6 +1,7 @@
 # Storyboard and Freeze
 
-Read this reference when mapping approved narration into deck slides or film scenes and freezing the approved structure.
+Read this reference when mapping approved narration into deck slides, film
+scenes, or motion units and freezing the approved structure.
 
 ## Contents
 
@@ -20,9 +21,14 @@ Output: `storyboard.md`.
 Route by `project-config.md`:
 
 - For `film`, read [film-mode.md](film-mode.md) and use its Scene/Shot storyboard schema. Do not add deck cover, page number, or slide-chrome rules.
+- For `motion`, read [motion-mode.md](motion-mode.md) and use
+  its Scene/Shot/Motion Unit schema. Do not add deck cover, page number, or
+  slide-chrome rules.
 - For `deck`, use the slide schema and rules below.
 
-In both formats, this is the only user-facing file for visual sequence review. It must map the complete approved narration in order without rewriting it.
+In every implemented format, this is the only user-facing file for visual
+sequence review. It must map the complete approved narration in order without
+rewriting it.
 
 ### Deck Storyboard
 
@@ -314,11 +320,15 @@ Output:
 
 - `deck`: `slide-specs/cover.md` and `slide-specs/NN.md`
 - `film`: `scene-specs/NN.md`
+- `motion`: `motion-specs/NN.md`
 
 Freeze mechanically:
 
 - in `deck`, split `<!-- cover --> ... <!-- /cover -->` into `slide-specs/cover.md` and every `<!-- slide: NN --> ... <!-- /slide -->` block into `slide-specs/NN.md`
 - in `film`, split every `<!-- scene: NN --> ... <!-- /scene -->` block into `scene-specs/NN.md`
+- in `motion`, split every `<!-- motion-unit: ID --> ... <!-- /motion-unit -->`
+  block into `motion-specs/ID.md`; preserve the stable ID and do not replace it
+  with the displayed sequence number
 - do not rewrite, polish, or add content during freeze
 - add source metadata to each slice:
 
@@ -342,6 +352,14 @@ For film scenes, use:
 <!-- source: storyboard.md -->
 <!-- storyboard-hash: HASH -->
 <!-- scene: 01 -->
+```
+
+For motion units, use:
+
+```md
+<!-- source: storyboard.md -->
+<!-- storyboard-hash: HASH -->
+<!-- motion-unit: concept-intro -->
 ```
 
 Before logic planning, HTML, TTS, preview, or recording, verify every active frozen spec has the current storyboard hash. If hashes differ, stop and re-freeze from `storyboard.md`.
