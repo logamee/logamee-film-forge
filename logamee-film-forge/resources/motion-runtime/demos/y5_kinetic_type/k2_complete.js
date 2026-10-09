@@ -35,9 +35,9 @@ SCENES['k2_complete'] = {
         const typed = TY.typed('  const name =', MO.at(t, b(4.75), 0.5)); T(typed, 96, 210, '#E9ECF5');
         const tw = TY.width(c, typed, 40, MONO), acc = t >= b(6.5);
         // 补全：第 6 拍整段灰字 0 帧闪现（补全本来就是瞬间出现），Tab 按下后变实色
-        if (t >= b(6)) T(" 'huashu';", 96 + tw, 210, acc ? '#C3E88D' : 'rgba(233,236,245,0.35)');
+        if (t >= b(6)) T(" 'player';", 96 + tw, 210, acc ? '#C3E88D' : 'rgba(233,236,245,0.35)');
         T('3', 40, 290, '#555A72'); if (acc) T('}', 96, 290, '#82AAFF', MO.at(t, b(6.6), 0.1));
-        if (Math.floor(t * 4) % 2 === 0) { const cxr = 96 + tw + (acc ? TY.width(c, " 'huashu';", 40, MONO) : 0); c.fillStyle = '#FFD23F'; c.fillRect(cxr + 4, 172, 5, 50); }
+        if (Math.floor(t * 4) % 2 === 0) { const cxr = 96 + tw + (acc ? TY.width(c, " 'player';", 40, MONO) : 0); c.fillStyle = '#FFD23F'; c.fillRect(cxr + 4, 172, 5, 50); }
         c.restore();
       }
       // Tab 键帽：第 6 拍弹出，6.5 拍按下（压 14%，e^-18t 回弹）

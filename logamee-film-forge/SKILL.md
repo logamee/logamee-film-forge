@@ -9,7 +9,7 @@ description: |
   review, and delivery as traceable stages.
 license: MIT
 metadata:
-  version: "1.23.0"
+  version: "1.26.0"
   author: Logamee
 ---
 
@@ -29,7 +29,17 @@ supports three production formats:
 The legacy `film` value remains readable for existing projects. It continues to
 mean the older continuous HTML/GSAP format and is not a new user-facing choice.
 
-This is a pure-text workflow guide. It does not bundle JavaScript libraries, TTS engines, browsers, ffmpeg, or model weights. The user's agent installs and verifies those dependencies in the local environment before the dependent step runs.
+This skill contains the workflow documents, a reusable Motion Runtime, example
+Canvas/SVG/HTML motion modules, fonts with their own notices, and incremental
+rendering helpers. It does not bundle browsers, TTS engines, ffmpeg, model
+weights, or private voice and character assets. The user's agent installs and
+verifies external dependencies in the local environment before the dependent
+step runs.
+
+The Motion Runtime is a reusable resource of this skill, not a second hidden
+project. It exposes material recipes, animation grammars, parameterized clips,
+character and long-scroll composition, deterministic seeking, and the stable
+unit contract used by the Film Forge workflow.
 
 It does not create a video from chat memory. It creates a chain of files, and every step reads the previous step's file output.
 
@@ -72,8 +82,9 @@ Production formats:
 - `motion`: use `motion-specs/`, `motion-logic.md`, `motion-code/`,
   and `motion.html`. Motion units own code-rendered scenes, local
   timelines, layers, and explicit transition boundaries.
-- `remotion`: reserved. Write the upstream planning artifacts and a blocked
-  implementation note, then stop before renderer-specific HTML or video work.
+- `remotion`: reserved. Write Film Forge's own planning artifacts and a
+  blocked implementation note, then stop before renderer-specific HTML or
+  video work.
 - `film` (legacy): use `scene-specs/`, `motion-logic.md`, and `film.html`.
   Scenes and shots share one deterministic global timeline and should feel like
   one evolving visual world.
@@ -84,7 +95,8 @@ When `Production Format: motion`, read and follow
 [references/motion-mode.md](references/motion-mode.md),
 [references/motion-production-workflow.md](references/motion-production-workflow.md),
 [references/motion-capability-catalog.md](references/motion-capability-catalog.md),
-and [references/motion-runtime-contract.md](references/motion-runtime-contract.md).
+and [references/motion-runtime-contract.md](references/motion-runtime-contract.md),
+plus [references/motion-integration-map.md](references/motion-integration-map.md).
 Read [references/motion-provenance.md](references/motion-provenance.md) when
 adapting external code, references, fonts, generated layers, or demo assets.
 When it is
@@ -137,6 +149,9 @@ implementation.
   not copy a third party's frames, character identity, audio, layout, private
   prompts, or documentation text. Keep required license notices for any code
   or assets that are actually reused.
+- When the Motion Runtime reuses or adapts external code, keep the legal
+  notice in [`THIRD-PARTY-NOTICES.md`](../THIRD-PARTY-NOTICES.md). Neutralizing
+  public branding does not permit removing copyright or license terms.
 - Before any paid, remote, cloned, or token-heavy TTS call, complete the static layout review, the no-audio animation demonstration, and the local-audio synchronized animation review. Do not spend TTS calls on a page that has not passed these reviews.
 - Before approving `narration-script.md`, run a continuous read-aloud pass. This may adapt article prose for speech while preserving approved claims, examples, order, and author stance.
 - In audio-synchronized modes and final export, every visual event that explains spoken content must be driven by the audio/subtitle cue clock. The no-audio animation demonstration is intentionally self-timed and is only a motion-quality review; it is not evidence of narration synchronization.
@@ -174,6 +189,18 @@ implementation.
   helper. Motion projects should expose the equivalent
   `getMotionRenderUnits()`, `prepareMotionUnit(id)`, and
   `seekMotionUnit(id, localTime)` contract.
+- For `motion`, use the reusable
+  [`scripts/render_motion_incrementally.mjs`](scripts/render_motion_incrementally.mjs)
+  helper after formal preview approval. It renders silent per-unit H.264
+  segments, preserves content-addressed caches, invalidates transition
+  dependents, assembles the visual track, and muxes audio separately. It
+  supports `--dry-run` and `--verify-local-invalidation=<unitId>`. It never
+  overwrites an approved output or deletes caches and assembly artifacts
+  automatically.
+- When a Motion unit has local code or asset dependencies, declare them in
+  `sourceFiles`, `assets`, `dependsOn`, and `renderRevision`. If dependencies
+  are not declared, the renderer may conservatively treat the shared runtime
+  as affecting every unit.
 - Treat archiving as a deliberate lifecycle transition. The default archive is
   an editable archive: it must preserve enough source, stable unit metadata,
   active HTML, formal audio, timing, and renderer information to revise one

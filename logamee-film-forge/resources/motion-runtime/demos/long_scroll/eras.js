@@ -16,6 +16,10 @@
     if (WORLD.segs.length === n || WORLD.segs[WORLD.segs.length - 1].id !== id) __bootErrors.push(`segments/${id}.js 没有 WORLD.add({ id: '${id}', ... })`); }
   // 每段用到的帧库（hero.walk、acts[].key、sprites）一次性登记成资源，引擎启动前全部加载
   const sprites = new Set(); WORLD.segs.forEach(s => { if (s.hero && s.hero.walk) sprites.add(s.hero.walk); (s.acts || []).forEach(a => a.key && sprites.add(a.key)); (s.sprites || []).forEach(k => sprites.add(k)); });
+  // The public runtime intentionally ships without private character frames.
+  // Ask XING to use its deterministic procedural replacement instead of
+  // probing for absent private metadata files during the boot sequence.
+  window.MOTION_ALLOW_SYNTHETIC_SPRITES = true;
   try { window.EXTRA_ASSETS = (window.EXTRA_ASSETS || []).concat(XING.sprites([...sprites])); } catch (e) { __bootErrors.push('帧库缺失：' + e.message); }
   WORLD.layout();
   window.PUNCH = 0;

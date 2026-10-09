@@ -21,7 +21,7 @@ the reference that matches the current phase.
 | Deck visual taste and composition judgment | [deck-art-direction.md](deck-art-direction.md) |
 | Deck measurable visual standard | [deck-visual-design-standard.md](deck-visual-design-standard.md) |
 | Continuous film mode | [film-mode.md](film-mode.md) |
-| Code-driven motion mode | [motion-mode.md](motion-mode.md), [motion-production-workflow.md](motion-production-workflow.md), [motion-capability-catalog.md](motion-capability-catalog.md), [motion-runtime-contract.md](motion-runtime-contract.md) |
+| Code-driven motion mode | [motion-mode.md](motion-mode.md), [motion-production-workflow.md](motion-production-workflow.md), [motion-capability-catalog.md](motion-capability-catalog.md), [motion-runtime-contract.md](motion-runtime-contract.md), [motion-integration-map.md](motion-integration-map.md) |
 | Content-to-form mapping | [FORM-MAP.md](FORM-MAP.md) |
 | Minimal HTML/CSS/SVG/Canvas/GSAP toolkit | [TOOLKIT.md](TOOLKIT.md) |
 
@@ -33,6 +33,7 @@ the reference that matches the current phase.
 | Professional presenter delivery plus cloned voice | [cloned-voice-video-production.md](cloned-voice-video-production.md) |
 | Deterministic timeline and preview/export parity | [hyperframes-adaptation.md](hyperframes-adaptation.md) |
 | Reference breakdown or external motion adaptation | [motion-provenance.md](motion-provenance.md) and `scripts/inspect_motion_reference.py` |
+| Verify the complete Motion capability inventory | `resources/motion-runtime/motion-capabilities.json` and `scripts/verify_motion_capabilities.py` |
 
 Do not load every reference for every task. In particular, `film-mode.md` is
 not needed for deck or motion work, `motion-mode.md` is not needed

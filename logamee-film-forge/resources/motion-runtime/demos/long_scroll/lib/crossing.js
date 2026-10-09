@@ -1,5 +1,6 @@
-// 长卷穿越片 · 共用库 XING（《花叔穿越名画》用的，随 demos/long_scroll 收进 skill）。
-// 角色＝AI 生的画风帧（gpt-image 按画风重画→绿幕抠图→切帧，见 references/10-角色.md），代码只管：在哪、多大、何时换帧、加什么材质。
+// 长卷穿越片 · 共用库 XING。
+// 角色可以是 AI 生成的画风帧，也可以是下面的程序化兜底角色；代码只管：
+// 在哪、多大、何时换帧、加什么材质。
 // 场景、运镜、石子、涟漪、睡莲、青蛙、转场全部代码画。
 //   XING.sprites(keys)               同步读 demos/long_scroll/frames/<key>/meta.json，返回资源列表（给 era.assets）
 //   XING.actor(c, key, i, o)         画第 i 帧：o={x,y(脚底),h(站立身高),mat:'monet'|'ukiyoe'|'vangogh'|'none',wx,t,flip,alpha}
@@ -45,22 +46,86 @@ X.strokes = (g, src, { cell = 10, len = 24, width = 6, angle, palette, seed = 1,
 // ================= 角色帧 =================
 X.SPR = {};
 const syncJSON = url => { const x = new XMLHttpRequest(); x.open('GET', url, false); x.send(); if (x.status !== 200) throw new Error(url + ' ' + x.status); return JSON.parse(x.responseText); };
+const syntheticMeta = key => ({
+  synthetic: true,
+  ref_h: 360,
+  frames: Array.from({ length: 8 }, (_, i) => ({
+    file: `__synthetic__${key}_${i}.png`,
+    ax: 130,
+    ay: 348,
+  })),
+});
+const syntheticFrame = (key, i) => {
+  const cv = P.canvas(260, 360), g = cv.getContext('2d');
+  const phase = i / 8 * Math.PI * 2;
+  const hue = Math.floor(U.hash(key.length * 97, i * 13) * 360);
+  const shirt = `hsl(${hue} 42% 72%)`;
+  const accent = `hsl(${(hue + 32) % 360} 58% 45%)`;
+  const sway = Math.sin(phase) * 7;
+  const leg = Math.sin(phase) * 15;
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  g.fillStyle = 'rgba(20,25,30,.14)'; g.beginPath(); g.ellipse(130, 348, 74, 9, 0, 0, TAU); g.fill();
+  g.strokeStyle = '#252525'; g.lineWidth = 7;
+  g.fillStyle = '#f3c8a8'; g.beginPath(); g.roundRect(104 + leg, 282, 20, 58, 8); g.fill(); g.stroke();
+  g.beginPath(); g.roundRect(136 - leg, 282, 20, 58, 8); g.fill(); g.stroke();
+  g.fillStyle = '#f7f5ee'; g.beginPath(); g.ellipse(108 + leg, 344, 31, 12, 0, 0, TAU); g.fill(); g.stroke();
+  g.beginPath(); g.ellipse(152 - leg, 344, 31, 12, 0, 0, TAU); g.fill(); g.stroke();
+  g.fillStyle = '#d7c39c'; g.beginPath(); g.roundRect(87, 232, 86, 58, 18); g.fill(); g.stroke();
+  g.fillStyle = shirt; g.beginPath(); g.roundRect(75, 150 + sway, 110, 94, 27); g.fill(); g.stroke();
+  g.strokeStyle = '#f3c8a8'; g.lineWidth = 18;
+  g.beginPath(); g.moveTo(82, 168 + sway); g.lineTo(52, 231 + sway); g.stroke();
+  g.beginPath(); g.moveTo(177, 170 + sway); g.lineTo(205, 112 + sway); g.stroke();
+  g.strokeStyle = '#252525'; g.lineWidth = 5;
+  g.beginPath(); g.moveTo(205, 112 + sway); g.lineTo(224, 100 + sway); g.stroke();
+  g.fillStyle = '#f3c8a8'; g.beginPath(); g.arc(130, 91 + sway, 55, 0, TAU); g.fill(); g.stroke();
+  g.fillStyle = '#f7f5ee'; g.beginPath(); g.moveTo(78, 67 + sway); g.quadraticCurveTo(130, 4 + sway, 182, 67 + sway); g.quadraticCurveTo(130, 45 + sway, 78, 67 + sway); g.closePath(); g.fill(); g.stroke();
+  g.fillStyle = accent; g.fillRect(96, 54 + sway, 68, 9);
+  g.fillStyle = '#252525'; g.beginPath(); g.arc(111, 93 + sway, 7, 0, TAU); g.arc(149, 93 + sway, 7, 0, TAU); g.fill();
+  g.strokeStyle = '#252525'; g.lineWidth = 4; g.beginPath(); g.moveTo(118, 118 + sway); g.quadraticCurveTo(130, 126 + sway, 142, 118 + sway); g.stroke();
+  return cv;
+};
+const registerSprite = (key, meta, synthetic = false) => {
+  X.SPR[key] = { key, meta, imgs: null, mats: {}, synthetic };
+  return X.SPR[key];
+};
 X.sprites = keys => {
   const list = [];
   for (const k of keys) {
-    if (!X.SPR[k]) { const meta = syncJSON(`demos/long_scroll/frames/${k}/meta.json`); X.SPR[k] = { key: k, meta, imgs: null, mats: {} }; }
-    X.SPR[k].meta.frames.forEach(f => list.push(`demos/long_scroll/frames/${k}/${f.file}`));
+    if (!X.SPR[k]) {
+      let meta, synthetic = false;
+      if (window.MOTION_ALLOW_SYNTHETIC_SPRITES) {
+        meta = syntheticMeta(k);
+        synthetic = true;
+        console.warn(`motion sprite "${k}" is missing; using a replaceable procedural fallback`);
+      } else {
+        try {
+          meta = syncJSON(`demos/long_scroll/frames/${k}/meta.json`);
+        } catch {
+          meta = syntheticMeta(k);
+          synthetic = true;
+          console.warn(`motion sprite "${k}" is missing; using a replaceable procedural fallback`);
+        }
+      }
+      registerSprite(k, meta, synthetic);
+    }
+    if (!X.SPR[k].synthetic) {
+      X.SPR[k].meta.frames.forEach(f => list.push(`demos/long_scroll/frames/${k}/${f.file}`));
+    }
   }
   return list;
 };
 function ensure(key) {
-  const S = X.SPR[key]; if (S.imgs) return S;
-  S.imgs = S.meta.frames.map(f => window.IMG[`demos/long_scroll/frames/${key}/${f.file}`]);
+  const S = X.SPR[key] || registerSprite(key, syntheticMeta(key), true);
+  if (S.imgs) return S;
+  S.imgs = S.synthetic
+    ? S.meta.frames.map((_, i) => syntheticFrame(key, i))
+    : S.meta.frames.map(f => window.IMG[`demos/long_scroll/frames/${key}/${f.file}`]);
   // 帽顶：最上面一行不透明像素的中心
   S.hat = S.imgs.map(im => { const c = P.canvas(im.width, im.height), g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, im.width, im.height).data;
     for (let y = 0; y < im.height; y++) { let x0 = -1, x1 = -1; for (let x = 0; x < im.width; x++) if (d[(y * im.width + x) * 4 + 3] > 140) { if (x0 < 0) x0 = x; x1 = x; } if (x0 >= 0 && x1 - x0 > 6) return [(x0 + x1) / 2, y]; } return [im.width / 2, 0]; });
   return S;
 }
+X.image = (key, i = 0) => ensure(key).imgs[i % ensure(key).imgs.length];
 // 材质：把 AI 帧再过一遍该画风的笔触，让他和场景用同一种「笔」（不碰深色＝眼镜、眼睛、头发不被糊掉）
 const MAT = {
   monet: { pad: 8, cell: 6, len: 12, width: 4.2, seed: 11, outline: 0, angle: (x, y, r) => -0.55 + (r() - 0.5) * 0.9,

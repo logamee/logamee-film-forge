@@ -1,4 +1,4 @@
-// 卡通与扁平插画 TOON：Kurzgesagt 式「无描边、双色分面」、柔光；故事型（storytime）极简角色「豆子花叔」、
+// 卡通与扁平插画 TOON：扁平双色分面、柔光；故事型（storytime）极简讲解员、
 // pose-to-pose 换姿势（快切＋身体挤压回弹）、眨眼时刻表、口型读口播包络（一拍二）、汗滴、漫画符号。
 (() => {
 const W = 1920, H = 1080;
@@ -26,8 +26,8 @@ TOON.ellipse = (x, y, rx, ry, a = 0) => { const p = new Path2D(); p.ellipse(x, y
 TOON.env = t => { const E = window.VO_ENV; if (!E) return 0; const i = Math.round(t * E.fps); return i < 0 || i >= E.a.length ? 0 : E.a[i]; };
 TOON.mouth = (t, fps = 12) => { const v = TOON.env(MO.step(t, fps)); return v < 0.06 ? 0 : v < 0.22 ? 1 : 2; };   // 0 闭 1 半 2 张
 
-// ---------- 豆子花叔（故事型极简角色） ----------
-// 正面、圆头、豆子身体、面条手臂。标志物：纯白渔夫帽、圆框黑眼镜（另：白T、卡其短裤、黑手表）。
+// ---------- 讲解员（故事型极简角色） ----------
+// 正面、圆头、简化身体、面条手臂。服装和识别物可由项目参数替换。
 // o: { x, y(脚底), s(头半径 px), pose:{l,r}(手臂目标点，相对肩，头半径单位), expr, mouth(0/1/2), blink, look:[dx,dy],
 //      squash(竖向缩放，以脚底为轴，体积守恒), tilt(头歪), bob(头下沉), browUp, lw }
 // expr: 'talk' | 'happy' | 'blank'(死鱼眼) | 'worry' | 'shock'。返回 { hl, hr(两手位置), head:[x,y] }
@@ -51,7 +51,7 @@ TOON.bean = (c, o) => {
     c.fillStyle = SK; c.beginPath(); c.roundRect(sx * R * 0.2 - R * 0.09, -R * 0.24, R * 0.18, R * 0.2, R * 0.05); c.fill(); c.stroke();
     c.fillStyle = '#FAFAF6'; c.beginPath(); c.ellipse(sx * R * 0.22, -R * 0.03, R * 0.17, R * 0.08, 0, 0, Math.PI * 2); c.fill(); c.stroke();
   }
-  const body = new Path2D();                                           // 身体（豆子）
+  const body = new Path2D();                                           // 身体（简化轮廓）
   body.moveTo(-R * 0.5, -R * 0.2);
   body.bezierCurveTo(-R * 0.62, -R * 0.75, -R * 0.55, bodyTop + R * 0.05, 0, bodyTop);
   body.bezierCurveTo(R * 0.55, bodyTop + R * 0.05, R * 0.62, -R * 0.75, R * 0.5, -R * 0.2);

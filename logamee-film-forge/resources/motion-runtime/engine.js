@@ -28,15 +28,30 @@ const motionUnit = (e, index) => ({
   start: e.t0,
   end: e.t1,
   duration: Math.max(0, e.t1 - e.t0),
+  motionDuration: Number.isFinite(Number(e.motionDuration))
+    ? Math.max(0, Number(e.motionDuration))
+    : Math.max(0, e.t1 - e.t0),
+  boundaryDuration: e.transition
+    ? Math.max(0, (e.transition.dur || 0) + (e.transition.delay || 0))
+    : 0,
   transition: e.transition ? {
     type: e.transition.type || 'cut',
     duration: (e.transition.dur || 0) + (e.transition.delay || 0),
-    dependsOn: index > 0 ? [ERAS[index - 1].unitId || ERAS[index - 1].id] : []
+    dependsOn: [
+      ...(e.transition.dependsOn || []),
+      ...(index > 0 ? [ERAS[index - 1].unitId || ERAS[index - 1].id] : [])
+    ]
   } : null,
   grammar: e.grammar || null,
   style: e.style || null,
   route: e.route || null,
   assets: [...(e.assets || []), ...(e.plate ? [e.plate] : [])],
+  sourceFiles: [...(e.sourceFiles || [])],
+  dependencies: [...(e.dependencies || [])],
+  // Content dependencies are different from incoming-transition dependencies.
+  // Keeping them separate prevents a local transition from invalidating all
+  // later units through a recursive signature chain.
+  dependsOn: [...(e.dependsOn || [])],
   renderRevision: e.renderRevision || 0,
 });
 const MOTION_UNITS = ERAS.map(motionUnit);
@@ -103,7 +118,10 @@ window.getMotionRenderUnits = () => MOTION_UNITS.map((u, i) => ({
   ...u,
   startFrame: Math.round(u.start * (window.RENDER_FPS || 60)),
   endFrame: Math.round(u.end * (window.RENDER_FPS || 60)),
-  dependsOn: i > 0 ? [MOTION_UNITS[i - 1].unitId] : [],
+  contentStart: Math.min(u.duration, u.boundaryDuration || 0),
+  contentDuration: Math.max(0, u.duration - Math.min(u.duration, u.boundaryDuration || 0)),
+  dependsOn: [...new Set(u.dependsOn || [])],
+  transitionDependsOn: [...new Set(u.transition?.dependsOn || [])],
 }));
 window.getMotionState = () => ({ ...motionState });
 window.motionReady = false;
@@ -138,6 +156,22 @@ async function boot() {
 window.IMG = IMG;
 
 const U = window.U;
+
+// The audio clock owns the output duration. A scene may keep its authored
+// animation timing and either compress it into the spoken beat or hold its
+// final state while the narration finishes.
+const sceneTimeAt = (e, localTime) => {
+  const outputDuration = Math.max(0, e.t1 - e.t0);
+  const authoredDuration = Number.isFinite(Number(e.motionDuration))
+    ? Math.max(0, Number(e.motionDuration))
+    : outputDuration;
+  if (!outputDuration || !authoredDuration) return 0;
+  return U.clamp(
+    (Number(localTime) || 0) * authoredDuration / outputDuration,
+    0,
+    authoredDuration,
+  );
+};
 
 // ---------- 角标（右上角）：可插拔 ----------
 // 每段 era.counter 三种写法：
@@ -300,12 +334,14 @@ function layersAt(t) {
   return out;
 }
 window.prepare = async function (t) {
-  await Promise.all(layersAt(t).map(k => ERAS[k].clip ? need(clipFrameUrl(ERAS[k], t - ERAS[k].t0)) : null));
+  await Promise.all(layersAt(t).map(k => ERAS[k].clip
+    ? need(clipFrameUrl(ERAS[k], sceneTimeAt(ERAS[k], t - ERAS[k].t0)))
+    : null));
 };
 
 // ---------- 画一个时代（本段局部时间 lt） ----------
 function drawEra(c, e, t, prev, punchFrom, noCounter) {
-  const lt = t - e.t0;
+  const lt = sceneTimeAt(e, t - e.t0);
   c.save();
   c.clearRect(0, 0, W, H);
   // 拍点镜头冲击（只作用于场景层，年份牌不缩放）：s(k)=1+0.03·(1-k/20)^1.5，k=转场开始后的帧数
@@ -363,8 +399,23 @@ window.seekMotionUnit = function (unitId, localTime = 0) {
   const u = byUnitId(unitId);
   if (!u) throw new Error(`seekMotionUnit: unknown unit ${unitId}`);
   const lt = U.clamp(Number(localTime) || 0, 0, u.duration);
-  const absoluteTime = U.clamp(u.start + lt, 0, window.__total);
+  const epsilon = 1 / (window.RENDER_FPS || 60);
+  const renderLocalTime = u.duration > epsilon ? Math.min(lt, u.duration - epsilon) : 0;
+  const absoluteTime = U.clamp(u.start + renderLocalTime, 0, window.__total);
   renderFrame(absoluteTime);
+  return window.getMotionState();
+};
+window.seekMotionUnitContent = function (unitId, localTime = 0) {
+  const u = byUnitId(unitId);
+  if (!u) throw new Error(`seekMotionUnitContent: unknown unit ${unitId}`);
+  const lt = U.clamp(Number(localTime) || 0, 0, u.duration);
+  const epsilon = 1 / (window.RENDER_FPS || 60);
+  const renderLocalTime = u.duration > epsilon ? Math.min(lt, u.duration - epsilon) : 0;
+  const absoluteTime = U.clamp(u.start + renderLocalTime, 0, window.__total);
+  const e = ERAS[u.index];
+  drawEra(ctx, e, absoluteTime, ERAS[u.index - 1], undefined, false);
+  if (window.GLOBAL_OVERLAY) window.GLOBAL_OVERLAY(ctx, absoluteTime);
+  updateMotionState(absoluteTime, u.index);
   return window.getMotionState();
 };
 window.seekMotion = function (seconds = 0) {

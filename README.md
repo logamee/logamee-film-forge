@@ -16,7 +16,7 @@
 
 [![License](https://img.shields.io/github/license/logamee/logamee-film-forge?style=flat&logo=opensourceinitiative&logoColor=white&color=4CAF50)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/logamee/logamee-film-forge?style=flat&logo=github&logoColor=white&color=FFB74D)](https://github.com/logamee/logamee-film-forge)
-[![Version](https://img.shields.io/badge/version-1.20.0-607D8B?style=flat&logo=git&logoColor=white)](https://github.com/logamee/logamee-film-forge)
+[![Version](https://img.shields.io/badge/version-1.26.0-607D8B?style=flat&logo=git&logoColor=white)](https://github.com/logamee/logamee-film-forge)
 [![Platform](https://img.shields.io/badge/macOS%20%7C%20Linux%20%7C%20Windows-9C27B0?style=flat&logo=apple&logoColor=white)](logamee-film-forge/SKILL.md)
 [![Claude](https://img.shields.io/badge/Claude-000000?style=flat&logo=anthropic&logoColor=white)](logamee-film-forge/SKILL.md)
 [![Hermes](https://img.shields.io/badge/Hermes-1565C0?style=flat)](logamee-film-forge/SKILL.md)
@@ -34,6 +34,7 @@
 
 - [这是什么](#这是什么)
 - [两个 Skill](#两个-skill)
+- [三种制作模式](#三种制作模式)
 - [完整流程](#完整流程)
 - [归档与清理](#归档与清理)
 - [两者如何配合](#两者如何配合)
@@ -47,15 +48,16 @@
 ## 这是什么
 
 它把「把内容做成视频」和「检查视频画面是否合格」拆成两个平行
-Skill：
+Skill。主 Skill 内部再按最终产物区分制作模式：
 
-- **logamee-film-forge** — 生产流程：文章 → Storyboard → HTML Deck → TTS → 字幕 → MP4
+- **logamee-film-forge** — 生产流程：文章 → Storyboard → HTML/Canvas Motion → TTS → 字幕 → MP4
 - **logamee-html-constraint** — 质量门：检查字体、间距、动画、字幕、越界等最低质量标准
 
 演示效果见：[微信公众号文章](https://mp.weixin.qq.com/s/scYzvNoLG4q6dhvFX2yFsw)。
 
-仓库只提供 Skill 文档、检查规则、参考材料和一个可复用的增量渲染辅助
-脚本，不捆绑运行时依赖。
+仓库提供 Skill 文档、检查规则、参考材料、可复用的 Motion Runtime
+资源和增量渲染辅助脚本。浏览器、ffmpeg、TTS、模型权重和私人声音/角色
+素材仍由具体项目按需配置。
 
 ## 两个 Skill
 
@@ -65,7 +67,35 @@ Skill：
 MP4。它同时支持：
 
 - `deck`：独立页面、逐页审核、逐页缓存，适合 PPT 型知识视频。
-- `film`：Scene/Shot 连续时间线，适合真正的连续视频表达。
+- `motion`：Canvas/SVG/HTML 驱动的连续动画，适合真正的视频化表达。
+- `remotion`：预留模式，目前只保留规划边界，尚未实现渲染器。
+- `film`：旧版连续 HTML/GSAP 时间线，仅为兼容已有项目。
+
+## 三种制作模式
+
+| 模式 | 最终产物 | 核心单位 | 适合场景 |
+|---|---|---|---|
+| `deck` | PPT 型翻页视频 | 稳定页面 | 结构讲解、截图、页面化知识 |
+| `motion` | 连续代码动画视频 | 稳定 Motion Unit | 视觉隐喻、角色、镜头、材质变化、动态图解 |
+| `remotion` | 预留 | 尚未实现 | 未来接入 Remotion |
+
+### Motion 能力
+
+`motion` 不是给 PPT 增加几个特效，而是一套独立的代码动画制作模式。
+它融合了 Canvas、SVG、HTML 和可选生成素材，支持：
+
+- 35 种可复用的视觉材质方向：岩洞浮雕、壁画、马赛克、手稿、印象派、点彩、剪纸、像素、蒸汽波、橡皮管卡通、皮影、明暗舞台等；
+- 9 类动画语法：尺度穿行、信息拼贴、白板生长、故事场景、动态排版、结构变形、界面序列、数据场和讲解员构图；
+- 8 个参数化动画片段和可复用的示例 spec；
+- 程序化绘制、分层素材、首尾帧视频板、混合路线；
+- 角色/精灵帧合成、长卷穿越、镜头运动、材质化转场和稳定锚点；
+- 确定性时间定位、字幕/Cue 时钟、碰撞与安全区检查；
+- 以 Motion Unit 为边界的缓存、局部重渲染和完整视频合成。
+
+Motion 的用户流程仍然遵循映画的审核节奏：先确认来源和口播，再定视觉
+方向、分镜和关键帧，然后依次审核静态画面、无音频动画、本地音频同步、
+正式音画同步，最后按单元增量渲染。具体项目可以只使用其中一部分能力，
+不需要为了使用一个风格而启用全部效果。
 
 用户只需要关心下面十五个节点：
 
@@ -165,11 +195,27 @@ logamee-film-forge/
 │       ├── deck-visual-design-standard.md
 │       ├── deck-design-and-html.md
 │       ├── film-mode.md
+│       ├── motion-mode.md
+│       ├── motion-production-workflow.md
+│       ├── motion-capability-catalog.md
+│       ├── motion-runtime-contract.md
+│       ├── motion-provenance.md
+│       ├── motion-integration-map.md
 │       ├── hyperframes-adaptation.md
 │       ├── cloned-voice-video-production.md
 │       └── tts-source-selection.md
+│   ├── resources/
+│       └── motion-runtime/       # 引擎、风格、片段、示例与字体许可
 │   └── scripts/
-│       └── render_deck_incrementally.mjs
+│       ├── render_deck_incrementally.mjs
+│       ├── render_motion_incrementally.mjs
+│       ├── inspect_motion_reference.py
+│       ├── qa_motion.py
+│       ├── check_motion_subtitle_band.py
+│       ├── subzone_gate.py
+│       ├── validate_motion_contract.py
+│       ├── verify_motion_capabilities.py
+│       └── verify_motion_incremental_fixture.mjs
 └── logamee-html-constraint/
     ├── SKILL.md
     └── references/

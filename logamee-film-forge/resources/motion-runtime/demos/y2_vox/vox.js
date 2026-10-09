@@ -5,7 +5,7 @@
 // → 转场 A「沿红线平移」：一条红线从剪报连到调查墙，相机沿线 1.1s 追过去（长尾 bezier）
 // ②调查墙：1000 万张截图里的猫被红线连到索引卡，打字机 13 字/秒，计数滚到 10,000,000，一张小照片带倾斜滑入放平
 // → 转场 B「推进照片→硬切」：相机推满那张小照片，硬切成同一张图的大幅扫描，再「拉出揭示」整张黑底拼贴
-// ③黑底：它脑中的「猫」、纸条标题打字＋荧光笔、花叔剪纸贴纸滑入、红笔圈住
+// ③黑底：它脑中的「猫」、纸条标题打字＋荧光笔、讲解员剪纸贴纸滑入、红笔圈住
 // 用到的库：CL（纸纹、撕边、网点照片、胶带、图钉、红线、毛边荧光笔、倾斜滑入、贴纸白边）、CAM（关键帧相机、推进锚点、运动模糊）、
 //           DG（手画圈、逐段描出）、TY.typedCount（打字机）、MO（longTail、12fps 步进）。
 (() => {
@@ -218,7 +218,7 @@ Y2.shot3 = (c, lt, t) => {
   // 红笔圈住（0.6s，12fps，首尾略交叉）
   const cq = MO.cubicOut(seg(st, 0.95, 1.5));
   if (cq > 0) { c.save(); c.translate(BIG.x, BIG.y); c.strokeStyle = C.red; c.lineWidth = 9; c.lineCap = 'round'; c.lineJoin = 'round'; DG.drawPartial(c, NCIRC, NCIRC_L, NCIRC_L[NCIRC_L.length - 1] * cq); c.restore(); }
-  // 花叔剪纸贴纸：带 12° 倾斜滑入放平；姿势按 12fps 步进（剪纸动画的一顿一顿）
+  // 讲解员剪纸贴纸：带 12° 倾斜滑入放平；姿势按 12fps 步进（剪纸动画的一顿一顿）
   const sq = clamp((st - 0.6) / 0.6);
   if (sq > 0) {
     const e = MO.quartOut(sq);

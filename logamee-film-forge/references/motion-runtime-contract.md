@@ -48,6 +48,7 @@ Every unit has a stable semantic ID and a local clock:
   "unitId": "concept-intro",
   "title": "概念进入",
   "duration": 4.2,
+  "motionDuration": 4.2,
   "grammar": "structural-transform",
   "style": "ink-sketch",
   "route": "procedural",
@@ -67,6 +68,11 @@ Every unit has a stable semantic ID and a local clock:
 
 The exact JSON or Markdown representation may differ, but the fields must be
 recoverable from the project files. `unitId` must not be a page number.
+`duration` is the output/audio-bound unit duration. `motionDuration` is
+optional: when present, the renderer maps the output clock into the authored
+animation clock and holds the final state after the authored motion has
+completed. This lets narration determine editorial timing without requiring
+every scene's internal animation to be rewritten.
 
 ## Browser API
 

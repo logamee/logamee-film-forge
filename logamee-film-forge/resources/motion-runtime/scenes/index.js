@@ -17,6 +17,7 @@
       if (r.err) { __bootErrors.push(`${e.id}: ${r.err}`); continue; }
       const sc = SCENES[e.id];
       if (!sc || typeof sc.draw !== 'function') { __bootErrors.push(`${e.id}: 文件里没有 SCENES['${e.id}'] = { draw(c, lt, t) }`); continue; }
+      e.sourceFiles = [...new Set([...(e.sourceFiles || []), `${dir}/${e.id}.js`])];
       e.draw = sc.draw; if (sc.init) e.init = sc.init;
     }
     const ty = e.transition && e.transition.type;

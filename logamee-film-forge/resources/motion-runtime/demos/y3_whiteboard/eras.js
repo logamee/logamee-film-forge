@@ -6,5 +6,5 @@ window.SCENE_LIBS = ['demos/_shared/presenter.js', 'demos/y3_whiteboard/whiteboa
 window.ERAS = [
   { id: 'y3_s1', dur: 2.5 },                                                  // 画猫、写「猫？」、写问题
   { id: 'y3_s2', dur: 2.25, transition: { type: 'same', dur: 0.8 } },         // 甩镜（0.8s 带运动模糊，笔不离板）
-  { id: 'y3_s3', dur: 3.25, transition: { type: 'same', dur: 0.85 } },        // 板上平滑移动 → 画花叔、「是猫！」→ 拉远看全图
+  { id: 'y3_s3', dur: 3.25, transition: { type: 'same', dur: 0.85 } },        // 板上平滑移动 → 画讲解员、「是猫！」→ 拉远看全图
 ];

@@ -1,7 +1,7 @@
 // 21 · 1980s 8-bit 像素游戏（通用 8-bit 语法，不指向任何一款游戏：夜晚紫色天空、像素星空和月亮、远山剪影、萤火虫、浮空木平台、星星方块、宝箱）。
 // 互动：跳起来顶星星方块，方块一跳，弹出一枚转着的像素金币，升到顶点闪一下消失，100 飘起、HUD 金币 7→8、分数 +100；他落地仰头再欢呼一跳。所有事件相对互动定时。
 // 画法沿用 skill 场景 14_8bit：整个世界在 1/8 分辨率画布上逐像素画（1 低像素 = 8 屏幕像素），imageSmoothing 关掉放大；天空交界用 (x+y)%2 棋盘抖动（NES 做渐变的唯一办法）。
-// 花叔＝AI 生的像素小人帧，代码再按 6px 网格降采样、alpha 二值化（去抗锯齿），保证是真·硬边像素。
+// 讲解员＝可替换的像素小人帧，代码再按 6px 网格降采样、alpha 二值化（去抗锯齿），保证是真·硬边像素。
 (() => {
 if (!window.D4) { const x = new XMLHttpRequest(); x.open('GET', 'demos/long_scroll/lib/xing2_ding.js', false); x.send(); (0, eval)(x.responseText); }
 const W = 1920, H = 1080, TAU = Math.PI * 2, { clamp, lerp, ss, ease } = U, P = PAINT;
@@ -67,11 +67,11 @@ function coin(c, x, y, t, s = 1) { // 像素金币：宽度 8/6/2/6 循环 = 翻
 }
 function hud(c, coins, score) {
   c.save(); c.font = '36px "PressStart2P-400"'; c.textBaseline = 'top'; c.fillStyle = '#000'; const T = (s, x, y) => { c.fillStyle = '#000'; c.fillText(s, x + 6, y + 6); c.fillStyle = '#fcfcfc'; c.fillText(s, x, y); };
-  T('HUASHU', 60, 40); T(String(score).padStart(6, '0'), 60, 88); T('×' + String(coins).padStart(2, '0'), 470, 88); coin(c, 444, 128, 0, 0.75);
+  T('PLAYER', 60, 40); T(String(score).padStart(6, '0'), 60, 88); T('×' + String(coins).padStart(2, '0'), 470, 88); coin(c, 444, 128, 0, 0.75);
   c.restore();
 }
 
-// ---------- 花叔像素化：6px 网格降采样＋alpha 二值化 ----------
+// ---------- 讲解员像素化：6px 网格降采样＋alpha 二值化 ----------
 const pix = (key, i) => D4.frameCanvas(key, i, 'px6', im => {
   const s = 300 / XING.SPR[key].meta.ref_h, k = s / 6, w = Math.max(1, Math.round(im.width * k)), h = Math.max(1, Math.round(im.height * k));
   const cv = P.canvas(w, h), g = cv.getContext('2d', { willReadFrequently: true }); g.imageSmoothingEnabled = false; g.drawImage(im, 0, 0, w, h);   // 最近邻：像素画源图的色块不被平均成泥

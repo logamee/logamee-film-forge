@@ -47,6 +47,56 @@ def stream_info(metadata: dict) -> tuple[int, int, float, float]:
     return int(stream["width"]), int(stream["height"]), fps, duration
 
 
+def fit_beat_grid(
+    cut_frames: list[int],
+    fps: float,
+    min_step: float,
+    max_step: float,
+    tolerance: float,
+    min_inlier_ratio: float,
+) -> dict | None:
+    """Fit a coarse beat grid to detected transition starts.
+
+    This is deliberately a timing aid rather than a claim about the source
+    music. It gives the director candidate subdivisions to test against
+    narration or a replacement score.
+    """
+    if len(cut_frames) < 4:
+        return None
+    observed = np.asarray(cut_frames, dtype=np.float64)
+    upper = min(max_step, float(np.diff(observed).max()))
+    if upper < min_step:
+        return None
+    best: tuple[tuple[int, float], dict] | None = None
+    candidates = np.arange(min_step, upper + 0.001, 0.25)
+    for step in candidates:
+        for origin in observed[: min(4, len(observed))]:
+            grid_index = np.round((observed - origin) / step)
+            residual = observed - (origin + grid_index * step)
+            inliers = np.abs(residual) <= tolerance
+            if float(inliers.mean()) < min_inlier_ratio:
+                continue
+            refined_origin = float(origin + residual[inliers].mean())
+            refined_residual = observed - (
+                refined_origin + grid_index * step
+            )
+            score = (int(inliers.sum()), float(step))
+            result = {
+                "originFrame": round(refined_origin, 3),
+                "stepFrames": round(float(step), 3),
+                "maxResidualFrames": round(
+                    float(np.abs(refined_residual[inliers]).max()), 3
+                ),
+                "inlierCutIndices": np.flatnonzero(inliers).astype(int).tolist(),
+                "outlierCutIndices": np.flatnonzero(~inliers).astype(int).tolist(),
+                "bpmIfEighthSubdivision": round(60 * fps / (step * 2), 3),
+                "bpmIfQuarterSubdivision": round(60 * fps / step, 3),
+            }
+            if best is None or score > best[0]:
+                best = (score, result)
+    return best[1] if best else None
+
+
 def frames(video: Path, width: int, height: int, pixel_format: str = "rgb24") -> np.ndarray:
     raw = run(
         [
@@ -80,6 +130,10 @@ def main() -> int:
     parser.add_argument("--out", required=True)
     parser.add_argument("--threshold", type=float, default=5.0)
     parser.add_argument("--debounce", type=int, default=12)
+    parser.add_argument("--grid-min-step", type=float, default=4.0)
+    parser.add_argument("--grid-max-step", type=float, default=240.0)
+    parser.add_argument("--grid-tolerance", type=float, default=1.5)
+    parser.add_argument("--grid-min-inlier-ratio", type=float, default=0.8)
     args = parser.parse_args()
 
     video = Path(args.video).expanduser().resolve()
@@ -95,6 +149,7 @@ def main() -> int:
     small = frames(video, 480, 270)
     gray = frames(video, 192, 108, "gray").astype(np.float32)
     diff = np.abs(np.diff(gray, axis=0)).mean(axis=(1, 2))
+    np.save(out / "frame-diff.npy", diff)
 
     cuts: list[int] = []
     for index in range(1, len(diff)):
@@ -103,6 +158,14 @@ def main() -> int:
                 cuts.append(index)
 
     bounds = [0, *cuts, len(small)]
+    beat_grid = fit_beat_grid(
+        cuts,
+        fps,
+        args.grid_min_step,
+        args.grid_max_step,
+        args.grid_tolerance,
+        args.grid_min_inlier_ratio,
+    )
     keyframe_records = []
     for segment, (start, end) in enumerate(zip(bounds[:-1], bounds[1:]), start=1):
         key_index = max(start, end - 3)
@@ -157,10 +220,15 @@ def main() -> int:
         "fps": fps,
         "duration": duration,
         "candidateCuts": [{"frame": frame, "time": round(frame / fps, 3)} for frame in cuts],
+        "beatGrid": beat_grid,
         "segments": keyframe_records,
         "method": {
             "threshold": args.threshold,
             "debounceFrames": args.debounce,
+            "gridMinStepFrames": args.grid_min_step,
+            "gridMaxStepFrames": args.grid_max_step,
+            "gridToleranceFrames": args.grid_tolerance,
+            "gridMinInlierRatio": args.grid_min_inlier_ratio,
             "motionHeatmapWindow": "skip the first 0.35s of non-opening segments",
         },
     }

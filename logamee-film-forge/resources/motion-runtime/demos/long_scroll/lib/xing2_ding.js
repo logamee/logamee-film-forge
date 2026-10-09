@@ -19,7 +19,7 @@ D4.hero = (seg, s) => {
   return { key, i, o, lx, hat: XING.hatTop(key, i, o), act: hero.p.kind === 'act' && hero.p.seg === seg ? hero.p.act : null, u: hero.u };
 };
 const FC = {};
-D4.img = (key, i) => window.IMG[`demos/long_scroll/frames/${key}/${XING.SPR[key].meta.frames[i].file}`];
+D4.img = (key, i) => XING.image(key, i);
 D4.frameCanvas = (key, i, tag, fn) => {
   const k = key + '|' + i + '|' + tag; if (FC[k]) return FC[k];
   const im = D4.img(key, i); const cv = fn(im); FC[k] = cv; return cv;

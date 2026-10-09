@@ -1,0 +1,164 @@
+{
+  "schema": "logamee-motion-capabilities-v1",
+  "format": "motion",
+  "materialRecipes": [
+    { "id": "cave-relief", "runtime": "scenes/01_cave.js" },
+    { "id": "egypt-mural", "runtime": "scenes/02_egypt.js" },
+    { "id": "attic-black-figure", "runtime": "scenes/03_greek.js" },
+    { "id": "roman-mosaic", "runtime": "scenes/04_roman.js" },
+    { "id": "gothic-illumination", "runtime": "scenes/05_gothic.js" },
+    { "id": "renaissance-sfumato", "runtime": "scenes/06_renaissance.js" },
+    { "id": "impressionist-light", "runtime": "scenes/08_impressionism.js" },
+    { "id": "directional-brushwork", "runtime": "scenes/09_postimp.js" },
+    { "id": "art-nouveau-poster", "runtime": "scenes/10_nouveau.js" },
+    { "id": "analytical-cubism", "runtime": "scenes/11_cubism.js" },
+    { "id": "geometric-modernism", "runtime": "scenes/12_bauhaus.js" },
+    { "id": "pop-halftone", "runtime": "scenes/13_pop.js" },
+    { "id": "pixel-arcade", "runtime": "scenes/14_8bit.js" },
+    { "id": "early-raytrace", "runtime": "scenes/15_raytrace.js" },
+    { "id": "contemporary-flat", "runtime": "scenes/16_2026.js" },
+    { "id": "literati-ink", "runtime": "scenes/17_ink.js" },
+    { "id": "ornamental-gold", "runtime": "scenes/18_klimt.js" },
+    { "id": "expressionist-distortion", "runtime": "scenes/19_munch.js" },
+    { "id": "dunhuang-mineral", "runtime": "scenes/20_dunhuang.js" },
+    { "id": "infinite-dot-field", "runtime": "scenes/21_kusama.js" },
+    { "id": "constructivist-poster", "runtime": "scenes/22_constructivism.js" },
+    { "id": "surreal-melt", "runtime": "scenes/23_dali.js" },
+    { "id": "hard-light-realism", "runtime": "scenes/24_hopper.js" },
+    { "id": "watercolor-background", "runtime": "scenes/25_ghibli.js" },
+    { "id": "vapor-neon", "runtime": "scenes/26_vaporwave.js" },
+    { "id": "cosmic-comic-print", "runtime": "scenes/27_kirby.js" },
+    { "id": "water-garden", "runtime": "scenes/28_monet.js" },
+    { "id": "pointillist-field", "runtime": "scenes/29_seurat.js" },
+    { "id": "cut-paper", "runtime": "scenes/30_matisse.js" },
+    { "id": "gesture-symbol", "runtime": "scenes/31_haring.js" },
+    { "id": "chiaroscuro-stage", "runtime": "scenes/32_rembrandt.js" },
+    { "id": "rubberhose-1930s", "runtime": "scenes/33_rubberhose.js" },
+    { "id": "shadow-theatre", "runtime": "scenes/34_shadowpuppet.js" },
+    { "id": "luminous-cel-sky", "runtime": "scenes/35_shinkai.js" },
+    { "id": "monochrome-blue", "runtime": "scenes/36_picasso_blue.js" }
+  ],
+  "animationGrammars": [
+    {
+      "id": "scale-journey",
+      "runtime": "clips/y1_kurzgesagt.js",
+      "demo": "demos/y1_kurzgesagt"
+    },
+    {
+      "id": "information-collage",
+      "runtime": "clips/y2_vox.js",
+      "demo": "demos/y2_vox"
+    },
+    {
+      "id": "whiteboard-growth",
+      "runtime": "clips/y3_whiteboard.js",
+      "demo": "demos/y3_whiteboard"
+    },
+    {
+      "id": "story-vignette",
+      "runtime": "clips/y4_storytime.js",
+      "demo": "demos/y4_storytime"
+    },
+    {
+      "id": "kinetic-type",
+      "runtime": "clips/y5_kinetic_type.js",
+      "demo": "demos/y5_kinetic_type"
+    },
+    {
+      "id": "structural-transform",
+      "runtime": "clips/t1_3b1b.js",
+      "demo": "demos/t1_3b1b"
+    },
+    {
+      "id": "interface-sequence",
+      "runtime": "clips/t2_keynote_ui.js",
+      "demo": "demos/t2_keynote_ui"
+    },
+    {
+      "id": "data-field",
+      "runtime": "clips/t3_finance_chart.js",
+      "demo": "demos/t3_finance_chart"
+    },
+    {
+      "id": "presenter-composition",
+      "runtime": [
+        "demos/_shared/presenter.js",
+        "lib/rig_presenter.js"
+      ],
+      "demo": null,
+      "status": "composition layer; provide project-owned presenter assets when needed"
+    }
+  ],
+  "parameterizedClips": [
+    "clips/t1_3b1b.js",
+    "clips/t2_keynote_ui.js",
+    "clips/t3_finance_chart.js",
+    "clips/y1_kurzgesagt.js",
+    "clips/y2_vox.js",
+    "clips/y3_whiteboard.js",
+    "clips/y4_storytime.js",
+    "clips/y5_kinetic_type.js"
+  ],
+  "assetRoutes": [
+    "procedural",
+    "layered",
+    "first-last-frame-plate",
+    "hybrid"
+  ],
+  "transitionFamilies": [
+    "continuation",
+    "material-reveal",
+    "matched-transformation",
+    "camera-handoff",
+    "hard-cut",
+    "rhythmic-impact"
+  ],
+  "compositionPatterns": [
+    {
+      "id": "long-scroll",
+      "runtime": [
+        "demos/long_scroll/eras.js",
+        "demos/long_scroll/lib/world.js",
+        "demos/long_scroll/lib/crossing.js"
+      ],
+      "supports": [
+        "continuous world",
+        "camera travel",
+        "seam-specific material changes",
+        "replaceable character frame libraries",
+        "procedural fallback presenter"
+      ]
+    },
+    {
+      "id": "presenter-and-sprite",
+      "runtime": [
+        "demos/_shared/presenter.js",
+        "lib/rig_presenter.js",
+        "lib/rig.js"
+      ]
+    },
+    {
+      "id": "reference-breakdown",
+      "runtime": "../scripts/inspect_motion_reference.py",
+      "supports": [
+        "contact sheets",
+        "candidate cuts",
+        "motion heatmaps",
+        "keyframes",
+        "candidate beat grid"
+      ]
+    },
+    {
+      "id": "motion-qa",
+      "runtime": "../scripts/qa_motion.py",
+      "supports": [
+        "determinism",
+        "frame motion",
+        "spike detection",
+        "text framing clues",
+        "subtitle-band clues",
+        "transition smoke tests"
+      ]
+    }
+  ]
+}

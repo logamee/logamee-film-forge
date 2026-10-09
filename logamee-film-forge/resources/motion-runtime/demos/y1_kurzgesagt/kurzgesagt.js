@@ -1,7 +1,7 @@
 // Y1 · Kurzgesagt 式扁平科普：「AI 是怎么学会认猫的」
 // 三镜：①夜晚山坡，机器人扫描一只猫（视差 5 层、慢推） → 转场 A「钻进镜头」：相机指数推进机器人眼睛，眼睛里是下一个世界
 // ②机器人脑中：像素猫 → 神经网络逐层点亮（边缘→形状→猫） → 转场 B「填满再拉出」：推进点亮的输出节点直到满屏黄，切到机器人发黄光的眼睛再指数拉远
-// ③白天草坡：花叔招手，机器人认出一只没见过的黑猫，标签弹出
+// ③白天草坡：讲解员招手，机器人认出一只没见过的黑猫，标签弹出
 // 时间全部用片内时间 ft = t - F0。镜头表在 Y1.SHOTS。
 // 用到的库：CAM（世界相机、视差层、对数缩放、推进锚点）、TOON（双色分面 flat、glow）、TY.charsIn（逐字上浮）、MO（k75 等缓动）。
 (() => {
@@ -303,7 +303,7 @@ Y1.shot3 = (c, lt, t) => {
   layer(c, cam, 0.75, g => { Y1.bird(g, -200 + ft * 150, 175 + Math.sin(ft * 3) * 14, ft, { s: 0.9, col: '#ff5d8f', sh: '#d63c70' }); Y1.bird(g, -420 + ft * 165, 225 + Math.sin(ft * 3 + 1) * 12, ft, { s: 0.7, col: '#ffb02e', sh: '#e08a10', ph: 0.15 }); });
   layer(c, cam, 1, g => {
     flat(g, poly([[-300, 900], [400, 860], [1000, 880], [1600, 850], [2300, 900], [2300, 1400], [-300, 1400]]), P.ground, '#3d8f33', P.groundHi, [0, -14], [0, 5]);
-    // 花叔：指向黑猫（point 姿势＋手臂与头的小幅持续摆动，嘴在说话）
+    // 讲解员：指向黑猫（point 姿势＋手臂与头的小幅持续摆动，嘴在说话）
     if (PRESENTER.y1(g, ft) === false) {                                        // 角色路由见 demos/_shared/presenter.js
     const HSb = PRESENTER_RIG.build({ x: 470, y: 900 + Math.sin(ft * 3.2) * 2, s: 0.66, face: 1, pose: PRESENTER_RIG.pose('point', 0, { ua1: 1.38 + 0.07 * Math.sin(ft * 3.4), fa1: 0.05 + 0.05 * Math.sin(ft * 3.4 + 1), head: -0.04 + 0.03 * Math.sin(ft * 2.1), mouth: 0.45 + 0.4 * Math.max(0, Math.sin(ft * 9)) }) });
       const pal = { skin: '#ffd3b4', hair: '#1f1a3a', shirt: '#ffffff', shorts: '#d9c9a8', hat: '#ffffff', hatBand: '#d8d4f2', shoe: '#f4f2ff', watch: '#2a2550' };
@@ -311,7 +311,7 @@ Y1.shot3 = (c, lt, t) => {
       for (const p of HSb.parts) flat(g, p.path, pal[p.role] || pal.skin, shade[p.role] || shade.skin, '#ffffff', [-10, -8], [-4, -3]);
       PRESENTER_RIG.details(g, HSb, { line: '#1f1a3a', lw: 3.5, glass: '#1f1a3a', cheek: 'rgba(255,120,120,.35)', earLine: 'rgba(200,110,90,.7)', shoeHole: '#8a86b8' });
     }
-    // 认识的那只橙猫蹲在花叔脚边；镜头要认的是一只「没见过的」黑猫
+    // 认识的那只橙猫蹲在讲解员脚边；镜头要认的是一只「没见过的」黑猫
     Y1.cat(g, 790, 905, ft + 0.3, { s: 0.55, face: -1, look: 0.5 });
     Y1.cat(g, 1420, 880, ft + 0.7, { s: 0.85, face: -1, pal: { fur: '#3a3550', sh: '#24203a', hi: '#5a5478', belly: '#4a4566', ear: '#ff8fa3', eye: '#d9ff6b', pupil: '#16132a' }, look: 0.2 });
     // 扫描光与机器人

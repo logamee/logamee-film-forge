@@ -1,10 +1,53 @@
 # Motion Production Workflow
 
-This is the motion branch of Film Forge. It is a branch-specific reading of
-the shared fifteen-step workflow, not a second approval system. The output is
-a continuous code-driven film: the viewer should feel that a visual world is
-changing, transforming, travelling, or performing an action, rather than
-watching a series of slides.
+This is the motion branch of Film Forge. It is a complete production mode, not
+a collection of effects added to the deck mode. The source motion system's
+useful production capabilities are already part of the Film Forge runtime:
+material recipes, animation grammars, parameterized clips, procedural and
+generated asset routes, characters, long-scroll worlds, reference breakdown,
+transitions, and motion QA. Film Forge adds the project boundary around them:
+source control, script approval, stable Motion Units, preview gates, audio
+synchronization, incremental rendering, delivery, and archive.
+
+The complete inventory is machine-checkable in
+`resources/motion-runtime/motion-capabilities.json`. The public skill uses
+neutral names and project-owned assets, while directly reused code remains
+covered by `THIRD-PARTY-NOTICES.md`.
+
+## The Motion User Workflow
+
+The motion branch keeps the same broad discipline as `deck`—script first,
+visual plan second, preview before expensive audio, final render last—but its
+visual unit is different. A page in `deck` becomes a time-bounded Motion Unit
+containing one coherent visual action and one or more shots.
+
+| Step | User-facing work | Motion artifact or review |
+|---|---|---|
+| 1 | Confirm the topic, audience, workdir, format, and whether the film is explanatory, narrative, historical, or abstract. | `project-config.md` |
+| 2 | Check browser, Canvas/SVG/HTML, fonts, ffmpeg, image/video tools, local audio, and timestamp support. | `environment-check.md` |
+| 3 | Preserve the source text, reference links, screenshots, generated assets, and licenses. | Source snapshot and asset inventory |
+| 4 | Confirm the viewer's mental model and which changes must be visually precise. | `content-understanding.md` |
+| 5 | Approve the continuous narration script and divide it into semantic beats. | `narration-script.md` |
+| 6 | Select an existing material recipe, animation grammar, asset route, clock basis, and transition language. If a reference exists, measure its mechanism first. | Motion Style Card and optional reference breakdown |
+| 7 | Approve the first complete still direction. When the visual direction affects the whole film, show up to three materially different options on the same beat. | Opening/settled keyframe |
+| 8 | Map the approved beats into stable Motion Units. Define opening, key state, settled state, primary action, cues, camera, assets, and seams. | `storyboard.md` and `motion-specs/` |
+| 9 | Review static keyframes and representative settled states. No audio and no playback. | `?review=1` or still renders |
+| 10 | Review the independent no-audio animation demonstration. It proves the visual action, not narration synchronization. | `?motionPreview=1` |
+| 11 | Review the same units against provisional local audio. The audio clock drives cues, subtitles, and completion. | `?audioPreview=1` |
+| 12 | Generate formal audio, measure it, and rebuild precise subtitle and cue timing. | `audio/`, `subtitles.json`, `timeline-manifest.json` |
+| 13 | Review the formal synchronized preview, including seeking, controls, collisions, safe areas, and the full run. | `?preview=1` |
+| 14 | Render only changed Motion Units and affected boundary transitions, then assemble and mux the approved audio. | `render-manifest.json` and `output.mp4` |
+| 15 | Run motion QA, validate the encoded result, deliver it, and record reusable feedback. | `motion-diagnostics.json` and delivery report |
+
+The user does not need to approve every internal cache signature or helper file.
+Those are Film Forge's engineering layer. The user does need to approve the
+script, motion direction, storyboard, keyframes, no-audio motion, local-audio
+sync, and formal synchronized preview.
+
+When a catalog recipe or grammar already fits the request, use it directly.
+Do not invent a second visual language merely because the project is new. A
+new recipe is justified only when the catalog cannot express the requested
+meaning, and it must then be added to the inventory and verified.
 
 ## What Motion Adds
 
@@ -117,6 +160,47 @@ subtitle boundary to cause a new visual event.
 The route can vary between units, but the style card must explain why. A
 project should not silently switch from deterministic diagram animation to a
 full generated video plate just because one shot is difficult.
+
+## Film Direction Rules
+
+The runtime supplies many visual languages, but a film still needs one
+directorial logic. Use these rules when turning a catalog choice into a
+complete sequence:
+
+1. **Keep a persistent world.** Establish a small set of anchors—an object,
+   character, route, horizon, desk, or camera axis—and preserve their meaning
+   across shots. The viewer should feel that the film is moving through one
+   world, not opening unrelated demos.
+2. **Give each unit one semantic verb.** A unit may contain several layers or
+   camera moves, but its main action must be expressible as one verb:
+   assemble, compare, traverse, transform, reveal, resolve, or hand off.
+   Supporting loops may add life, but they must not compete with that action.
+3. **Make the material carry a recurring motif.** Repeat one authored behavior
+   such as a brush pass, paper edge, tile spread, light sweep, elastic bounce,
+   or typographic landing. The motif gives the chosen style a recognizable
+   rhythm without forcing every shot into the same composition.
+4. **Use the next unit to motivate the transition.** Prefer a route, stroke,
+   camera direction, object, or texture that naturally hands attention into the
+   next unit. Use a hard cut when the argument needs a reset; do not add a
+   transition merely to show that the renderer can do one.
+5. **Align motion to a clock.** Explanatory motion belongs to the spoken-audio
+   cue clock; montage-like motion may use an explicit BPM grid; early
+   no-audio previews use a deterministic demonstration clock. Never let
+   uncontrolled wall-clock callbacks decide when meaning changes.
+6. **Protect quiet holds.** After a meaningful transformation, hold the readable
+   result long enough for the narrator and viewer to register it. A dense
+   sequence of entrances is not richer than one well-timed change.
+7. **Vary scale, not identity.** Change camera distance, crop, or layer depth
+   when the idea changes, but keep the palette, line behavior, typography, and
+   anchor rules stable unless the change itself is the subject.
+8. **Design for revision.** Keep the unit boundary at a meaningful editorial
+   beat, declare local dependencies, and make transitions depend only on the
+   neighboring units they actually touch. The final film can be continuous
+   while a changed unit remains cheap to rebuild.
+
+These rules are the motion equivalent of page-level visual judgment in
+`deck`. They are not additional user approval gates; they guide the style card,
+storyboard, motion logic, and review decisions already listed above.
 
 ## Motion Unit Review Table
 

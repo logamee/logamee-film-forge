@@ -1,5 +1,5 @@
 // y4 本片共用：配色、姿势时间线（pose-to-pose＋换姿势回弹）、眨眼、字幕。
-// 用到的库：TOON（豆子花叔 bean、poseAt、blinkAt、alive、口型读 VO_ENV）、TY.text（字幕）、CAM（镜头）、MO（步进、弹簧）。
+// 用到的库：TOON（讲解员、poseAt、blinkAt、alive、口型读 VO_ENV）、TY.text（字幕）、CAM（镜头）、MO（步进、弹簧）。
 (() => {
 const S = window.STORY = {};
 // 背景压低饱和与对比、线更细更灰；角色线最黑最粗 —— 视线永远先落到角色上

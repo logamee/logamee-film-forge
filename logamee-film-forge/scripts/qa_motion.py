@@ -38,6 +38,7 @@ from playwright.sync_api import sync_playwright
 ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
 ap.add_argument('--project'); ap.add_argument('--spec', help='参数化片段 spec（走 clip.html，和 render.py --spec 同一套）'); ap.add_argument('--ids'); ap.add_argument('--fps', type=float, default=30)
 ap.add_argument('--out'); ap.add_argument('--film', default='', help='片子名：读 eras_<名>.js'); ap.add_argument('--skip', type=float, default=0.35, help='每段开头跳过的秒数（镜头冲击）')
+ap.add_argument('--html', help='项目入口 HTML；未指定时优先使用 motion.html，再回退到 index.html')
 ap.add_argument('--sub-band', type=float, default=None, help='字幕带上沿（占画高比例）；整片默认 0.852（920/1080），--spec 默认读 safe.bottom；写 0 关掉「进字幕带」检查')
 a = ap.parse_args()
 if not (a.project or a.spec): ap.error('--project 或 --spec 二选一')
@@ -54,6 +55,11 @@ if a.spec:                                                 # 和 render.py 同�
     if (spec.get('data') or {}).get('image'): spec['data']['image'] = ref(spec['data']['image'])
 root = Path(a.project).resolve() if a.project else Path(__file__).resolve().parent / 'engine'
 out = Path(a.out) if a.out else (Path(a.spec).resolve().parent / 'qa' if a.spec else root.parent / 'qa'); out.mkdir(parents=True, exist_ok=True)
+if not spec:
+    html_path = (root / (a.html or ('motion.html' if (root / 'motion.html').exists() else 'index.html'))).resolve()
+    if not html_path.exists() or root not in html_path.parents:
+        raise SystemExit(f'项目入口 HTML 不存在或不在项目目录内：{html_path}')
+    html_name = html_path.relative_to(root).as_posix()
 VW, VH = (spec.get('width', 1920), spec.get('height', 1080)) if spec else (1920, 1080)
 if a.sub_band is None:   # 片段给管线用：字幕让位写在 spec 的 safe.bottom 里，没写就当没有烧录字幕
     sb = ((spec or {}).get('safe') or {}).get('bottom', 0) if spec else None
@@ -213,7 +219,10 @@ with sync_playwright() as p:
         pg.add_init_script('window.CLIP_SPEC = ' + json.dumps(spec, ensure_ascii=False) + ';')
         pg.goto(f'http://127.0.0.1:{port}/clip.html?render=1')
     else:
-        pg.goto(f'http://127.0.0.1:{port}/index.html?render=1' + (f'&film={a.film}' if a.film else ''))
+        pg.goto(
+            f'http://127.0.0.1:{port}/{urllib.parse.quote(html_name)}?render=1'
+            + (f'&film={a.film}' if a.film else '')
+        )
     pg.wait_for_function('window.__ready === true || !!window.__bootFailed', timeout=180000)
     bf = pg.evaluate('window.__bootFailed || null')
     if bf: raise SystemExit('❌ 场景加载失败：\n' + bf)
@@ -288,10 +297,10 @@ if fr: rows += ['', '框景线索（全片秒，持续 ≥0.3s；去看这一帧
 if report.get('transitions'): rows += ['', '转场冒烟（整帧，峰值 ms）：' + '，'.join(f"{r['type']}→{r['id']} {r['ms_max']}" for r in report['transitions'])]
 (out / 'qa.md').write_text('\n'.join(rows) + ('\n\n页面报错：\n' + '\n'.join(errors) if errors else '') + '\n')
 print('->', out / 'qa.md')
-if not spec and root != Path(__file__).resolve().parent / 'engine':   # 回流兜底（11 号第一节）：qa 是交付前必跑的，在这里提醒，不让 qa 失败
+if not spec and root != Path(__file__).resolve().parent / 'engine':   # 经验回流兜底：qa 是交付前必跑的，在这里提醒，不让 qa 失败
     import re, time
     draft = next((d / 'motion-feedback-draft.md' for d in (root.parent, root.parent.parent) if (d / 'motion-feedback-draft.md').exists()), None)
-    if not draft: print(f'经验回流提醒：项目根（{root.parent.name}）还没有 motion-feedback-draft.md。每轮改完追加几条，格式见 skill 的 references/11-进化协议.md 第四节。')
+    if not draft: print(f'经验回流提醒：项目根（{root.parent.name}）还没有 motion-feedback-draft.md。每轮改完追加几条，格式见 skill 的 references/motion-production-workflow.md 的 Experience Feedback 节。')
     else:
         txt = draft.read_text(); age = (time.time() - draft.stat().st_mtime) / 60
         tail = txt.rsplit('> 同步水位线', 1)[-1] if '> 同步水位线' in txt else txt     # 同步水位线以下＝还没写回 skill 的
